@@ -29,7 +29,7 @@ export default function AxiosWrapper(props) {
 };
 
 
-async function axiosWrapper2(method, url) {
+async function axiosWrapper2(method, url, data=null) {
 
     if (method.toUpperCase() === "GET") {
 
@@ -37,10 +37,25 @@ async function axiosWrapper2(method, url) {
             .catch(function (error) {
                 console.log(error);
             });
-
+        if(res) {
         console.log("Async Result:");
         console.log(res.data.results);
-        return res.data.results;
+        return res.data.results;}
+
+
+    } else if (method.toUpperCase() === "POST") {
+
+        console.log("Posting:");
+        console.log(data);
+        const res = await axios.post(url, data)
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+          
+          
     };
 
 }

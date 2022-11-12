@@ -1,16 +1,17 @@
 import React from 'react';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
-
+import AxiosWrapper, { axiosWrapper2 } from './HTTP';
+const axios = require('axios').default;
 
 function Basic() {
     const SignupSchema = Yup.object().shape({
-        firstName: Yup.string()
+        first_name: Yup.string()
             .min(2, 'Too Short!')
             .max(50, 'Too Long!')
             .required('Required'),
 
-        lastName: Yup.string()
+        last_name: Yup.string()
             .min(2, 'Too Short!')
             .max(50, 'Too Long!')
             .required('Required'),
@@ -21,31 +22,49 @@ function Basic() {
 
     });
 
+    const url = 'http://127.0.0.1:8000/customusers/'
+
     return (
 
         <Formik
             initialValues={{
-                firstName: '',
-                lastName: '',
+                first_name: '',
+                last_name: '',
                 email: '',
                 color: '',
             }}
+
             onSubmit={async (values) => {
+                
+                axios({
+                    method: "POST",
+                    url: url,
+                    data: values,
+                    headers:   { 
+                        "content-type": "application/json"
+                      }
+                })
+                    .then(response => console.log(response))
+                    .catch(error => console.log(error));
+
+                console.log(values);
                 console.log(JSON.stringify(values, null, 2));
+                //axiosWrapper2("push", url, values);
                 alert(JSON.stringify(values, null, 2));
-                await new Promise((r) => setTimeout(r, 500));
+                
             }}
+
             validationSchema={SignupSchema}
         >
             <Form>
                 <div className="form-group mb-2">
-                    <label htmlFor="firstName">First Name</label>
-                    <Field id="firstName" name="firstName" placeholder="Jane" className="form-control" />
+                    <label htmlFor="first_name">First Name</label>
+                    <Field id="first_name" name="first_name" placeholder="Jane" className="form-control" />
                 </div>
 
                 <div className="form-group mb-2">
-                    <label htmlFor="lastName">Last Name</label>
-                    <Field id="lastName" name="lastName" placeholder="Doe" className="form-control" />
+                    <label htmlFor="last_name">Last Name</label>
+                    <Field id="last_name" name="last_name" placeholder="Doe" className="form-control" />
                 </div>
 
                 <div className="form-group mb-2">
@@ -71,6 +90,7 @@ function Basic() {
                 </div>
                 <button type="submit" className="btn btn-primary my-3">Submit</button>
             </Form>
+
         </Formik>
 
     );

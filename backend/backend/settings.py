@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'core',
+    'channels',
+    'daphne',
+    
 ]
 
 MIDDLEWARE = [
@@ -126,11 +129,11 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ORIGIN_WHITELIST = [
+CORS_ALLOWED_ORIGINS = [
      'http://localhost:3000'
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = True
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
@@ -140,3 +143,11 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
     ],
 }
+
+ASGI_APPLICATION = 'backend.routing.application'
+
+CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND':'channels.layers.InMemoryChannelLayer'
+            }
+        }
