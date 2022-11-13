@@ -28,19 +28,18 @@ class DemoIndicatorConsumer(AsyncJsonWebsocketConsumer):
 
     async def random_info(self, event):
         while True:
+            x = random.randint(0, 2)
             content = json.dumps(
                 {
-                    "message": {
-                        "mess": event["message"],
-                        "value": random.randint(0, 100),
-                        "tag": "indicator"
-                    }
+                    "message": event["message"],
+                    "value": random.randint(0, 100) + 100*x,
+                    "tag": ["abc", "xyz","ghi"][x],
                 }
             )
 
             await self.send(text_data=content)
             print(content)
-            await asyncio.sleep(10)
+            await asyncio.sleep(5)
 
     async def disconnect(self, code):
         pass

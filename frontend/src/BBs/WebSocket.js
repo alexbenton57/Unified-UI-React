@@ -10,7 +10,8 @@ class ConnectionSymbol extends Component {
     };
 
     client = new W3CWebSocket('ws://127.0.0.1:8000/ws/' + this.state.room); //gets room_name from the state and connects to the backend server ;
-
+    // https://www.kianmusser.com/articles/react-where-put-websocket/
+    
     componentDidMount() {
 
         this.client.onopen = () => {
@@ -20,8 +21,8 @@ class ConnectionSymbol extends Component {
 
         this.client.onmessage = (message) => {
             const data = JSON.parse(message.data);
-            if (data.message.tag === "indicator") {
-                this.setState({ value: data.message.value })
+            if (data.tag === "abc") {
+                this.setState({ value: data.value })
             }
         }
 

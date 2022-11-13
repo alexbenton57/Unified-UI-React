@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,7 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'core',
     'channels',
-    'daphne',
+    
     
 ]
 
@@ -144,7 +145,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-ASGI_APPLICATION = 'backend.routing.application'
+ASGI_APPLICATION = 'backend.asgi.application'
 
 CHANNEL_LAYERS = {
         'default': {
