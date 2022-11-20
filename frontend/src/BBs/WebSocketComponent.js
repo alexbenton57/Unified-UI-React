@@ -21,15 +21,16 @@ class ConnectionSymbol extends Component {
 
         this.client.onmessage = (message) => {
             const data = JSON.parse(message.data);
+            console.log("Received: ", data)
             if (data.tag === "abc") {
                 this.setState({ value: data.value })
             }
-        }
+        };
 
         this.client.onclose = () => {
             console.log("Websocket Disconnect");
             this.setState({ status: false });
-        }
+        };
 
     }
 
