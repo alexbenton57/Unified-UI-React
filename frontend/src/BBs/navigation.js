@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import * as Icon from 'react-bootstrap-icons';
+import ConnectionSymbol from './ConnectionSymbol';
 
 function NavBar() {
     return (
@@ -19,6 +20,7 @@ function NavBar() {
       <div className="d-flex flex-column bg-dark text-light min-vh-100">
         <ul className="nav nav-pills flex-column mb-1 align-items-start">
           {items.map((item) => <SideBarNavItem key={item} href='#' icon={Icon.Pencil} friendly='Nav Title' hr={false} />)}
+          <ConnectionSymbol className="mt-auto"/>
         </ul>
       </div>
     );

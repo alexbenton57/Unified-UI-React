@@ -2,12 +2,11 @@ import React, { Fragment, useEffect, useState, useRef } from 'react'
 
 import Table, { TestTable } from './BBs/Table.js';
 import { FloorPlan } from './BBs/FloorPlan';
-import { LargeNumber } from './BBs/indicators.js';
 import { NavBar, SideBar } from './BBs/navigation.js';
-import { ConnectionSymbol } from './BBs/WebSocketComponent.js';
 import { Basic } from './BBs/UserInputs.js';
-import { SocketHandler } from './websocket.js';
+import { SocketHandler, SocketLogger } from './websocket.js';
 import { SocketEnabledIndicator, ConfigurableIndicator } from './BBs/indicators.js';
+import { ConfigurableComponent } from './BBs/ConfigurableComponent.js';
 
 import './App.css';
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -21,19 +20,25 @@ function App() {
 
 function Cards() {
 
-	const config = {
-		
-	}
+	const [indicatorSettings, setIndicatorSettings] = useState(JSON.parse('{"redEnd":20,"yellowEnd":60,"greenColor":"danger"}'));
 
 	return (
 		<Fragment>
-			<Card width="s" height="l" > <TestTable />  </Card>
-			<Card width="s" height="l" > Next step - think about how to configure a BB from a json object. Is is done live with a settings button? Is it done from a page configurator as in demoCode? (May need HTTP request to django to get all things to subscribe to, or just a url for each websocket and http endpoint.) Or is it done from a compiler? Or a mix of the above?</Card>
-			<Card width="s" height="l"> <SocketEnabledIndicator /> </Card>
-			<Card width="xxl" height="m"> <ConfigurableIndicator /> </Card>
-			<Card width="xxl" height="m"> <Table url='http://127.0.0.1:8000/customusers/' /> </Card>
-			<Card width="xxl" height="xl"> <Basic /> </Card>
-			<Card width="xxl" height="l" ><FloorPlan /></Card>
+			<Card width="xxl" height="xxs" title="JSON Input for Configurable Indicator"><div className="row px-3"><input className="col-12" type="text" value={JSON.stringify(indicatorSettings)} onChange={(e) => setIndicatorSettings(JSON.parse(e.target.value))} /></div></Card>
+			<Card width="s" height="l" title="Configurable Indicator"><span>{React.cloneElement(<ConfigurableComponent />, { redEnd: indicatorSettings.redEnd, yellowEnd: indicatorSettings.yellowEnd, greenColor: indicatorSettings.greenColor })}</span></Card>
+			<Card width="s" height="l" title="Websocket Logger" > <SocketLogger /> </Card>
+			<Card width="s" height="l" title="Subscribing to a WebSocket Message Tag"> <SocketEnabledIndicator /> <p className='text-sm'>Note - The websocket system definitely needs checking - there are are a lot of subtleties I'm sure I'm missing</p></Card>
+			<Card width="s" height="m"title="Note"> Next I want to reconfigure Component to have a settings icon which can pull out a list of parameters from a building block and feed them into an autoformatted form. <hr /> Also check out KendoReact for UI components.</Card>
+			<Card width="s" height="m" title="Indicator configurable through a form"> <ConfigurableIndicator /> <p></p></Card>
+			<Card width="s" height="m" title="Pulling options object from a component">
+				<p>Configurable Indicator Options:</p>
+				<p>{JSON.stringify(ConfigurableComponent.options)}</p>
+				<p>Next step is to dynamically create a form from these, possibly using a helper function on the options object, eg orientation: addChoice(...), redEnd: addFloat(). Form input verification and formatting can go off that.</p>
+			</Card>
+
+			<Card width="xxl" height="m" title="Users table"> <Table url='http://127.0.0.1:8000/customusers/' /> </Card>
+			<Card width="xxl" height="xl" title="Form to create new users"> <Basic /> </Card>
+			<Card width="xxl" height="l" title="Randomised Factory Floor" ><FloorPlan/></Card>
 		</Fragment>
 	);
 }
@@ -63,12 +68,14 @@ function Card(props) {
 	return (
 		<div className={"col " + widthDict[props.width]}>
 			<div className={"card " + heightDict[props.height]}>
-				<div className="card-header">A Building Block</div>
+				<div className="card-header">
+					{props.title ? props.title : "A Building Block"}
+				</div>
 				<div className="card-body">
 					{props.directContent && props.directContent}
 					{props.children}
 				</div>
-				<div className="card-footer">A Card Footer</div>
+				{props.footer && <div className="card-footer">A Card Footer</div>}
 			</div>
 		</div>
 	);

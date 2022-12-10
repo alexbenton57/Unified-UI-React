@@ -68,7 +68,7 @@ class GlobalConsumer(AsyncJsonWebsocketConsumer):
                 {
                     "message": event["message"],
                     "value": random.randint(0, 100) + 100*x,
-                    "tag": ["100", "channel1", "channel2"][x],
+                    "tag": ["100",  "channel1", "channel2"][x],
                 }
             )
 
