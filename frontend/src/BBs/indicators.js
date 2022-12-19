@@ -105,3 +105,10 @@ export const ConfigurableIndicator = (props) => {
         </Fragment>
     )
 }
+
+ConfigurableIndicator.options = {
+    redEnd: "float",
+    yellowEnd: "float",
+    greenColour: {options: ["danger", "success", "warning"]},
+    title: "string"
+}

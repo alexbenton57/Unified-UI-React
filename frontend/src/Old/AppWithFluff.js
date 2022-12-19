@@ -249,3 +249,270 @@ function App() {
 
 export default App;
 export { Card }
+
+/*
+function AppWs() {
+	const [isPaused, setPause] = useState(false);
+	const ws = useRef(null);
+
+	useEffect(() => {
+		ws.current = new WebSocket("wss://ws.kraken.com/");
+		ws.current.onopen = () => console.log("ws opened");
+		ws.current.onclose = () => console.log("ws closed");
+
+		const wsCurrent = ws.current;
+
+		return () => {
+			wsCurrent.close();
+		};
+	}, []);
+
+	useEffect(() => {
+		if (!ws.current) return;
+
+		ws.current.onmessage = e => {
+			if (isPaused) return;
+			const message = JSON.parse(e.data);
+			console.log("e", message);
+		};
+	}, [isPaused]);
+
+	return (
+		<div>
+			<button onClick={() => setPause(!isPaused)}>
+				{isPaused ? "Resume" : "Pause"}
+			</button>
+		</div>
+	);
+}
+
+function AppWithReactContextWrapper() {
+
+	// https://rossbulat.medium.com/react-managing-websockets-with-redux-and-context-61f9a06c125b
+	// https://alexboots.medium.com/using-react-context-with-socket-io-3b7205c86a6d
+	// https://stackoverflow.com/questions/72372760/use-context-to-share-content-after-socket-connection-in-react
+	return (
+		<wsContext.Provider value={{}}>
+			<AppWithReactContext />
+		</wsContext.Provider>
+
+	);
+}
+
+function SocketProvider(props) {
+	const [value, setValue] = useState({});
+	useEffect(() => { },)
+
+	return (
+		<wsContext.Provider value={value}>
+			{props.children}
+		</ wsContext.Provider>
+
+	)
+
+
+
+}
+
+
+export function AppWithReactContext() {
+
+	const webSocketRef = useRef(null);
+	const setSocketData = React.useContext
+
+
+	useEffect(() => {
+		webSocketRef.current = new W3CWebSocket('ws://127.0.0.1:8000/ws/indicator');
+		webSocketRef.current.onopen = () => console.log("WebSocket Connection Opened");
+		webSocketRef.current.onclose = () => console.log("Websocket Connect Closed");
+
+		return () => webSocketRef.current.close();
+
+	}, []);
+
+	useEffect(() => {
+		webSocketRef.current.onmessage = (message) => {
+			console.log("Websocket Received", message.data);
+			const data = JSON.parse(message.data);
+			var socketDataCopy = { ...socketData };
+			socketDataCopy[data.tag] = data.value;
+			// Line below rerenders entire app every time - no bueno
+			// Which I think means redux is the answer
+			setSocketData(socketDataCopy);
+			console.log("Socket Data: ", socketData);
+		};
+	}, [])
+
+	return (
+		<WSContext.Provider value={1}>
+			<AppContent />
+		</WSContext.Provider>
+
+	);
+
+function AppWithRecoil() {
+
+	const [val, setVal] = useState(null);
+	const [allRecoilConsumers, setAllRecoilConsumers] = useRecoilState(allRecoilConsumersAtom);
+	const webSocketRef = useRef(null);
+
+	const allRecoilConsumersAtom = atom({
+		key: "allRecoilConsumers",
+		default: []
+	})
+
+	const recoilConsumerAtom = (tag) => atom({
+		key: `${tag}`,
+		default: 0
+	})
+
+	//https://alexduterte.medium.com/recoil-js-and-its-dynamic-state-2431ac8406aa
+
+	useEffect(() => {
+
+		const client = new W3CWebSocket('ws://127.0.0.1:8000/ws/indicator');
+
+		client.onopen = () => {
+			console.log("WebSocket Connection Opened");;
+		};
+
+		client.onclose = () => {
+			console.log("Websocket Connect Closed");
+		};
+
+		client.onmessage = (message) => {
+			console.log("Websocket Received", message.data);
+			const data = JSON.parse(message.data);
+			if (allRecoilConsumers.includes(data.tag)) {
+				//Update apropriate recoil consumer
+			} else {
+				// create hook for managing recoil consumer - doesn't seem possible
+				// Would need to dynamically create eg [consumer{tag}, setConsumer{tag}] as dynamic var names
+			}
+		};
+
+		webSocketRef.current = client;
+
+		return () => {
+			client.close();
+		};
+	}, []);
+
+	return (
+		<RecoilRoot>
+			<AppContent />
+		</RecoilRoot>
+
+	);
+}
+
+function AppWithRedux() {
+	//https://javascript.plainenglish.io/the-only-introduction-to-redux-and-react-redux-youll-ever-need-8ce5da9e53c6
+	//https://react-redux.js.org/tutorials/quick-start 
+
+	return (
+		<div>Empty Div</div>
+	)
+}
+}*/
+
+
+
+function AppContentOld() {
+
+	const navBarStyle = {};
+	const sideBarStyle = {};
+	const mainWindowStyle = {
+		top: 0,
+		bottom: 0,
+		position: "absolute",
+		overflowY: "auto",
+		overflowX: "scroll",
+		width: "83.33334%",
+	}
+
+	return (
+		<div id="containerContainer">
+			<div className="container-fluid fixed-top">
+				<NavBar />
+				<div className="row">
+					<div className="col col-3 col-xl-2 px-0">
+						<SideBar />
+					</div>
+					<div className="col p-0" id="MainContentWindow">
+						<div className="px-0 py-4" style={mainWindowStyle}>
+							<div className="row g-3 m-3" id="ModalWindow">
+								<Cards />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	)
+}
+
+function AppContentWithReactStyles() {
+
+	const navBarStyle = {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		height: 48,
+		width: "100%",
+
+	};
+
+	const sideBarStyle = {
+		position: "absolute",
+		top: 48,
+		width: window.innerWidth * 0.17,
+		height: window.innerHeight - 48,
+		position: "absolute",
+
+	};
+
+	const mainWindowStyle = {
+		top: 48,
+		left: window.innerWidth * 0.17,
+		bottom: 0,
+		height: window.innerHeight - 48,
+		position: "absolute",
+		overflowY: "auto",
+		width: window.innerWidth * 0.83,
+	}
+
+	return (
+		<div style={{ scrollX: "hidden" }}>
+			<div className="" style={navBarStyle} id="navBarContainer">
+				<NavBar />
+			</div>
+			<div className="" style={sideBarStyle} id="sideBarContainer">
+				<SideBar />
+			</div>
+			<div className="container-fluid" style={mainWindowStyle} id="mainWindowContainer">
+				<div className="row g-3 m-3" id="ModalWindow">
+					<Cards />
+				</div>
+			</div>
+		</div>
+
+		/*
+		<div className="container-fluid">
+			<NavBar />
+			<div className="row">
+				<div className="col col-3 col-xl-2 px-0">
+					<SideBar />
+				</div>
+				<div className="col p-0" id="MainContentWindow">
+					<div className="px-0 py-4" style={mainWindowStyle}>
+						<div className="row g-3 m-3" id="ModalWindow">
+							<Cards />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		*/
+	)
+}
