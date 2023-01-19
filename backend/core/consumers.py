@@ -62,6 +62,7 @@ class GlobalConsumer(AsyncJsonWebsocketConsumer):
         )
 
     async def random_info(self, event):
+        n=0
         while True:
             x = random.randint(0, 2)
             content = json.dumps(
@@ -73,7 +74,21 @@ class GlobalConsumer(AsyncJsonWebsocketConsumer):
             )
 
             await self.send(text_data=content)
-            print(content)
+            
+            if n==5:
+                array_content = json.dumps(
+                    {
+                        "message": event["message"],
+                        "value": [random.randint(0, 100) for i in range(7)],
+                        "tag": "random_array"
+                    }
+                )
+                await self.send(text_data=array_content)
+                n = 0
+                
+            n+=1
+                
+            
             await asyncio.sleep(1)
 
     async def disconnect(self, code):

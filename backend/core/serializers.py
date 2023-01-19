@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User, Group
-from core.models import CustomUser
+from core.models import CustomUser, Datum, ValueHistory
 from rest_framework import serializers
 
 
@@ -18,3 +18,14 @@ class CustomUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['first_name', 'last_name', 'email', 'color']
+        
+class DatumSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Datum
+        fields = ['id', 'value']
+        
+class ValueHistorySerializer(serializers.HyperlinkedModelSerializer):
+        
+    class Meta:
+        model = ValueHistory
+        fields = ['value', 'time']

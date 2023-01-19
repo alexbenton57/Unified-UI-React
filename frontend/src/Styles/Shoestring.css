@@ -1,0 +1,91 @@
+:root {
+    --full-height: calc(100vh - 40px - 48px);
+}
+
+.card-shadow {
+    box-shadow: -3px 3px 4px #EEE;
+}
+
+.card-body {
+    overflow-y: auto;
+}
+
+
+.stfixed {
+    top: 0;
+    bottom: 0;
+    position: absolute;
+    overflow-y: auto;
+    overflow-x: scroll;
+    width: 83.33334%;
+    width: -moz-available;
+    /* For Mozilla */
+    width: -webkit-fill-available;
+    /* For Chrome */
+    width: stretch;
+    /* Unprefixed */
+}
+
+#root{
+    overflow-y:hidden;
+}
+
+#navBarContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 48px;
+    background-color: aqua;
+}
+
+#sideBarContainer {
+    position: absolute;
+    top: 48px;
+    left: 0;
+    width: 17%;
+    height: calc(100vh - 48px);
+}
+
+#mainWindowContainer {
+    position: absolute;
+    top:48px;
+    left:17%;
+    width:83%;
+    height:calc(100vh - 48px);
+    overflow-y: auto;
+}
+
+#modal-overlay {
+    position:absolute;
+    top:48px;
+    left:17%;
+    width:83%;
+    height:calc(100vh - 48px);
+    z-index: 1000;
+}
+
+
+.card.card-full {
+    height: var(--full-height);
+}
+
+.card.card-two-third {
+    height: calc(calc(var(--full-height) - 16px) * 2/ 3);
+}
+
+.card.card-half {
+    height: calc(calc(var(--full-height) - 16px) / 2);
+}
+
+.card.card-third {
+    height: calc(calc(var(--full-height) - 32px) / 3);
+}
+
+.card.card-quarter {
+    height: calc(calc(var(--full-height) - 48px) / 4);
+}
+
+.card.card-sixth {
+    height: calc(calc(var(--full-height) - 80px) / 6);
+}

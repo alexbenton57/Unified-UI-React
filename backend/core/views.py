@@ -30,3 +30,33 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = []
+    
+#http://localhost:8000/datums/?name=Datum1&history=7
+    
+class DatumViewSet(viewsets.ModelViewSet):
+    
+    permission_classes = []
+    
+    
+    def get_queryset(self):
+        print(self.request.query_params)
+        datum = self.request.query_params.get("name")
+        history = int(self.request.query_params.get("history"))
+        
+        if datum and history:
+            return Datum.objects.get(id=datum).valuehistory_set.all()[:history]
+        elif datum:
+            return Datum.objects.filter(id=datum)
+        else:
+            return Datum.objects.all()
+    
+    def get_serializer_class(self):
+        history = self.request.query_params.get("history")
+        
+        if history:
+            return ValueHistorySerializer
+        else:
+            return DatumSerializer
+             
+    
+    queryset = CustomUser.objects.all()

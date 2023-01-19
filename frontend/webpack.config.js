@@ -1,0 +1,1 @@
+resolve: {root: path.resolve("./src")}
