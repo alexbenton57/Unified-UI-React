@@ -30,6 +30,12 @@ class Messenger extends EventTarget {
       data !== undefined ? new CustomEvent(tag, { detail: data }) : new CustomEvent(tag);
     this.dispatchEvent(newEvent);
   }
+
+  request_value(tag) {
+    const newEvent = new CustomEvent("request_value", {detail: tag})
+    this.dispatchEvent(newEvent)
+  }
+
 }
 
 export function MessengerHandler({ children }) {
@@ -57,6 +63,8 @@ function SocketHandler({ messenger }) {
 
   const webSocketRef = useRef(null);
   const [status, setStatus] = useState(socketStatuses.INITIALISING);
+  const [latestValues, setLatestValues] = useState({})
+
   async function updateStatus(socketStatus) {
     while (!messenger) {
       await new Promise((res) => setTimeout(res, 100));
@@ -85,6 +93,7 @@ function SocketHandler({ messenger }) {
       if (typeof message !== "undefined" && message !== null) {
         const data = JSON.parse(message.data);
         messenger.emit(data.tag, data.value);
+        setLatestValues(lv => ({...lv, [data.tag]: [data.value]}))
       }
     };
     
@@ -115,6 +124,25 @@ function SocketHandler({ messenger }) {
         break;
     }
   }, [status]);
+
+  useEffect(() => {
+    async function addUpdateListener() {
+      while (!messenger) {
+        await new Promise((res) => setTimeout(res, 100));
+      }
+
+      
+      messenger.addEventListener("request_value", msg => {
+        if (latestValues[msg.detail]) {
+          messenger.emit(msg.detail, latestValues[msg.detail]);
+          console.log("Request Value Emitted", msg.detail, latestValues[msg.detail])
+        }
+        
+      })
+    }
+
+    addUpdateListener()
+  }, [messenger])
 
   return null;
   

@@ -1,6 +1,6 @@
 import React from "react";
-
-export default function Card({ width, height, title, footer, children, header}) {
+import ErrorBoundary from "Infrastructure/ErrorBoundary";
+export default function Card({ width, height, title, children, header, body, footer }) {
   let widthDict = {
     xss: "col-2",
     xs: "col-3",
@@ -23,10 +23,18 @@ export default function Card({ width, height, title, footer, children, header}) 
   return (
     <div className={"col " + widthDict[width]}>
       <div className={"card " + heightDict[height]} style={{ boxShadow: "-3px 3px 4px #EEE" }}>
+        {header ? header : <div className="card-header">{title ? title : "A Building Block"}</div>}
 
-        {header ? header: <div className="card-header">{title ? title : "A Building Block"}</div>}
-        
-        <div className="card-body">{children}</div>
+        {body ? (
+          body
+        ) : (
+          <div className="card-body">
+            <ErrorBoundary fallback={<p>Error in rendering card contents</p>}>
+              {children}
+            </ErrorBoundary>
+          </div>
+        )}
+
         {footer && <div className="card-footer">A Card Footer</div>}
       </div>
     </div>

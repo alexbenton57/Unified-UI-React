@@ -42,8 +42,30 @@ class ValueHistory(models.Model):
     def __str__(self):
         return (self.datum.id+str(id))
         
+class Checklist(models.Model):
+    
+    id = models.SlugField("id", max_length=50, primary_key=True, unique=True, editable=False)
+    name = models.CharField("name", max_length=50)
+    
+    def __str__(self):
+        return self.name
+    
+    def add(self, text):
+        newItem = ChecklistItem(text=text, complete=False, deleted=False, checklist=self)
+        newItem.save()
+        
 
-
+class ChecklistItem(models.Model):
+    
+    id = models.BigAutoField(primary_key=True, unique=True, editable=False)
+    text = models.TextField()
+    complete = models.BooleanField()
+    deleted = models.BooleanField()
+    time_created = models.DateTimeField(auto_now_add=True)
+    checklist = models.ForeignKey(Checklist, related_name="items", on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return self.text
         
     
 

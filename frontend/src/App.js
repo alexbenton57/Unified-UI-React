@@ -11,8 +11,7 @@ import { SocketEnabledIndicator, ConfigurableIndicator } from "./BBDemos/indicat
 import { ConfigurableComponent } from "./BBDemos/ConfigurableComponent";
 import ConfigurableCard from "./Infrastructure/ConfigurableCard";
 import Card from "Infrastructure/Card";
-
-
+import stringify from "Utils/stringify";
 
 import ChartDemo from "./BBDemos/Chartjs";
 import RechartDemo, { RechartDemoUseHTTP } from "./BBDemos/Recharts";
@@ -28,14 +27,16 @@ import "./Styles/Shoestring.css";
 import {
   ConfiguratorForm as ConfiguratorFormSingle,
   DataSourceComponent as DataSourceComponentSingle,
-  addDefaultSourceValues
+  addDefaultSourceValues,
 } from "./Infrastructure/ConfigurableDataSource";
 
-import LineChartMultiInput from "multivar/LineChartMultiInput";
+import LineChartMultiInput from "BuildingBlocks/LineChartMultiInput";
 import ConfiguratorForm from "multivar/ConfiguratorForm";
 import DataSourceComponent from "multivar/ConfigurableDataSource";
+import BuildingBlockWrapperMulti from "multivar/BuildingBlockWrapperMulti";
 
 import { ConfiguratorFormMulti, DataSourceComponentMulti } from "multivar/ConfigurableDataSource";
+import Checklist from "BuildingBlocks/Checklist";
 
 ReactModal.setAppElement(document.getElementById("root"));
 
@@ -50,10 +51,11 @@ function App() {
 
 function AppContent(props) {
   const pages = [
+    { id: "page0", page: TodoPage, icon: Icon.CheckSquare, title: "Dev Checklist" },
     { id: "page1", page: Page1, icon: Icon.Plug, title: "WebSocket" },
     { id: "page2", page: Page2, icon: Icon.Globe, title: "HTTP" },
     { id: "page3", page: Page3, icon: Icon.Building, title: "Factory Floor" },
-    { id: "page4", page: Page4, icon: Icon.PencilSquare, title: "Configuration" },
+    { id: "page4", page: Page4, icon: Icon.PencilSquare, title: "Configurable Card" },
     { id: "page5", page: Page5, icon: Icon.PlugFill, title: "Data Source Config" },
     { id: "page6", page: Page6, icon: Icon.Plugin, title: "Multi Data Config" },
   ];
@@ -94,6 +96,24 @@ function AppContent(props) {
   );
 }
 
+function TodoPage() {
+
+
+  const content = Checklist;
+  const [contentConfig, setContentConfig] = useState(addDefaultSourceValues(content.options));
+
+  return (
+    <Fragment>
+      <Card width="xxl" height="xl" title="Development To Do">
+        <DataSourceComponent content={content} config={contentConfig} />
+      </Card>      
+      <Card width="xxl" height="xl" title="Configurator">
+        <ConfiguratorForm content={content} setConfig={setContentConfig} />
+      </Card>
+      </Fragment>
+  );
+}
+
 function Page1() {
   const [indicatorSettings, setIndicatorSettings] = useState(
     JSON.parse('{"redEnd":20,"yellowEnd":60,"greenColor":"danger"}')
@@ -120,7 +140,7 @@ function Page1() {
       </Card>
 
       <Card hide={true} width="s" height="m" title="Configurable Indicator">
-        <p>This component receives appearance parameters from the JSON input above. </p>
+        <p>This component receives appearance parameters from the JSON input above. (Channel 1) </p>
         {React.cloneElement(<ConfigurableComponent />, {
           redEnd: indicatorSettings.redEnd,
           yellowEnd: indicatorSettings.yellowEnd,
@@ -267,17 +287,21 @@ function Page5() {
   return (
     <Fragment>
       <Card width="m" height="xl" title="Line Chart Configurator">
-        <ConfiguratorFormSingle content={content} config={contentConfig} setConfig={setContentConfig} />
+        <ConfiguratorFormSingle
+          content={content}
+          config={contentConfig}
+          setConfig={setContentConfig}
+        />
       </Card>
       <Card width="m" height="xl" title="Data Source Component">
         <DataSourceComponentSingle content={content} config={contentConfig} />
       </Card>
 
       <Card width="m" height="xl" title="Config from form">
-        <span>{JSON.stringify(contentConfig, null, 2)}</span>
+        <span>{stringify(contentConfig)}</span>
       </Card>
       <Card width="m" height="xl" title="Default Options">
-        <span>{JSON.stringify(content.options, null, 2)}</span>
+        <span>{stringify(content.options)}</span>
       </Card>
     </Fragment>
   );
@@ -285,7 +309,7 @@ function Page5() {
 
 function Page6() {
   console.log("render - Page6");
-  const content = LineChartMultiInput
+  const content = LineChartMultiInput;
   const [contentConfig, setContentConfig] = useState(addDefaultSourceValues(content.options));
 
   return (
@@ -294,14 +318,14 @@ function Page6() {
         <ConfiguratorForm content={content} setConfig={setContentConfig} />
       </Card>
       <Card width="m" height="xl" title="Data Source Component">
-        <DataSourceComponent content={content} config={contentConfig} />
+        <BuildingBlockWrapperMulti content={content} config={contentConfig} />
       </Card>
 
       <Card width="m" height="xl" title="Config from form">
-        <pre>{JSON.stringify(contentConfig, null, 2)}</pre>
+        <pre>{stringify(contentConfig)}</pre>
       </Card>
       <Card width="m" height="xl" title="LineChartMultiInput.options">
-        <pre>{JSON.stringify(content.options, null, 2)}</pre>
+        <pre>{stringify(content.options)}</pre>
       </Card>
     </Fragment>
   );

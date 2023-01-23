@@ -26,7 +26,7 @@ export default function LineChartTwoInput({ dataSeries1, dataSeries2, lineType, 
                 data={getData()}
                 margin={{
                     top: 5,
-                    right: 5,
+                    right: 30,
                     left: 5,
                     bottom: 5,
                 }}

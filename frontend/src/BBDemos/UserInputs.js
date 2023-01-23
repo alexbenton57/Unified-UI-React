@@ -2,6 +2,7 @@ import React from 'react';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 import axiosWrapper from './HTTP';
+import stringify from 'Utils/stringify';
 const axios = require('axios').default;
 
 function Basic() {
@@ -48,8 +49,8 @@ function Basic() {
                     .catch(error => console.log(error));
 
                 console.log(values);
-                console.log(JSON.stringify(values, null, 2));
-                alert(JSON.stringify(values, null, 2));
+                console.log(stringify(values));
+                alert(stringify(values));
                 
             }}
 

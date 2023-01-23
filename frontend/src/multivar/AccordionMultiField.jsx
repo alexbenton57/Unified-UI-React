@@ -1,18 +1,10 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { Formik, Form } from "formik";
+import React, { Fragment, useState } from "react";
+
 
 import AutoFieldMulti, {
-  sources,
   SEPARATOR,
-  websocketChannels,
 } from "./AutoFieldMulti";
 
-  
-
-import useLogOnChange from "Hooks/useLogOnChange";
-import BuildingBlockWrapperMulti from "./BuildingBlockWrapperMulti";
-import { string } from "yup";
-import DataSource from "Infrastructure/DataSource";
 
 function FormLabel({htmlFor, children}) {
     return (
@@ -25,6 +17,7 @@ export default function AccordionMultiField({ option, multiValues, setMultiValue
     const n = multiValues[option.label]; // Number of items in list
     const range = [...Array(n).keys()];
     const [activeIndex, setActiveIndex] = useState(0);
+    
     const remove = () => {
       console.log("setMultivalues", n);
       setActiveIndex(n > 0 ? n - 2 : n - 1); // Index of active item
@@ -37,7 +30,7 @@ export default function AccordionMultiField({ option, multiValues, setMultiValue
   
     return (
       <Fragment>
-        {console.log("Accordion", multiValues, activeIndex)}
+
         
         <div className="col-12 accordion" id={"accordion_" + option.label}>
   

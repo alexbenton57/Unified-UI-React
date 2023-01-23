@@ -10,7 +10,7 @@ import AutoFieldMulti, {
 import useLogOnChange from "Hooks/useLogOnChange";
 import BuildingBlockWrapperMulti from "./BuildingBlockWrapperMulti";
 import { string } from "yup";
-import DataSource from "Infrastructure/DataSource";
+import DataSource from "Classes/DataSource";
 
 export default function DataSourceComponent(props) {
   useLogOnChange(props.config, "(render) Config passed to DataSourceComponent()");

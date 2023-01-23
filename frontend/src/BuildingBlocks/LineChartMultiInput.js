@@ -25,6 +25,8 @@ export default function LineChartMultiInput({data, refValue, refText}) {
     });
     return newData;
   }
+  
+  const colours = ["red", "green", "blue", "pink", "purple"]
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -45,7 +47,7 @@ export default function LineChartMultiInput({data, refValue, refText}) {
         <Tooltip />
         <Legend />
         <ReferenceLine y={refValue} stroke="green" label={refText} />
-        {data.map(obj => <Line name={obj.name} key={obj.key} type={obj.lineType} dataKey={obj.key}/>)}
+        {data.map((obj, i) => <Line name={obj.name} key={obj.key} type={obj.lineType} dataKey={obj.key} color={colours[i]}/>)}
 
       </Chart>
     </ResponsiveContainer>
@@ -56,8 +58,8 @@ export default function LineChartMultiInput({data, refValue, refText}) {
 const typeChoices = ["basis", "linear", "natural", "monotone", "step"];
 
 LineChartMultiInput.options = Object.freeze([
-  // labels alphanumeric only
-
+  
+  // Multi option - [text datasource, text, and a choice]
   {
     label: "data",
     verbose: "Chart Series",
@@ -74,6 +76,8 @@ LineChartMultiInput.options = Object.freeze([
       },
     ],
   },
+
+  // Datasource option - number
   {
     label: "refValue",
     verbose: "Reference Line Value",
@@ -81,6 +85,8 @@ LineChartMultiInput.options = Object.freeze([
     type: "number",
     dataSource: true,
   },
+
+  // Simple option - text
   { label: "refText", verbose: "Reference Line Text", initial: "Default Overall Name", type: "text" },
 ]);
 

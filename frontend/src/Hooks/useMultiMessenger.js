@@ -9,8 +9,7 @@ export default function useMultiMessenger(wsConfig) {
     const [wsData, setWsData] = useState(wsConfig);
     const messenger = useMessengerContext();
     const [listeners, setListeners] = useState([]);
-    console.log("render - useMultiMessenger", wsData)
-
+    
     useEffect(() => {
         async function doSocket() {
 
@@ -22,6 +21,7 @@ export default function useMultiMessenger(wsConfig) {
                 messenger.removeEventListener(listener.tag, listener);
                 console.log("Removing Listener", listener);
             }
+            setListeners([])
 
             for (const label of Object.keys(wsConfig)) {
                 const tag = wsConfig[label]["tag"]
@@ -37,6 +37,8 @@ export default function useMultiMessenger(wsConfig) {
                 messenger.addEventListener(newListener.tag, newListener);
                 setListeners((list) => [...list, newListener]);
                 console.log("Adding Listener", newListener);
+
+                messenger.request_value(tag)
             }
 
         }
@@ -55,7 +57,6 @@ export default function useMultiMessenger(wsConfig) {
 
     }, [wsConfig, setWsData]);
 
-    console.log("Returning wsData", wsData)
     return wsData;
 
 }

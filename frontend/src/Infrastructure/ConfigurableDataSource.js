@@ -6,7 +6,7 @@ import AutoField, { sources, SEPARATOR, websocketChannels } from "./AutoField";
 import Card from "./Card";
 import useLogOnChange from "Hooks/useLogOnChange";
 import BuildingBlockWrapper from "Infrastructure/BuildingBlockWrapper";
-import DataSource from "./DataSource";
+import DataSource from "../Classes/DataSource";
 
 function getFormInitialValues(opts) {
   const initialValues = {};
