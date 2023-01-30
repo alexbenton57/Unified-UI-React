@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+
 import App from './app';
 
 export const API_URL = "http://localhost:8000/customusers/";

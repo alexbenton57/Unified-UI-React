@@ -6,6 +6,8 @@ import AutoFieldMulti, {
 } from "./AutoFieldMulti";
 
 
+
+
 function FormLabel({htmlFor, children}) {
     return (
       <label className="px-2" htmlFor={htmlFor}>{children}</label>
@@ -17,7 +19,6 @@ export default function AccordionMultiField({ option, multiValues, setMultiValue
     const n = multiValues[option.label]; // Number of items in list
     const range = [...Array(n).keys()];
     const [activeIndex, setActiveIndex] = useState(0);
-    
     const remove = () => {
       console.log("setMultivalues", n);
       setActiveIndex(n > 0 ? n - 2 : n - 1); // Index of active item

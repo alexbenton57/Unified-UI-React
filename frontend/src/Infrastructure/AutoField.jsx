@@ -1,32 +1,43 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useRef, useEffect, useCallback } from "react";
 import * as Icon from "react-bootstrap-icons";
 import ReactModal from "react-modal";
-import { Formik, Field, Form } from "formik";
+import { Formik, Field, useField, Form } from "formik";
 
 export const websocketChannels = ["100", "channel1", "channel2", "random_array"];
 export const sources = { HTTP: "http", CONSTANT: "constant", WS: "ws", SOURCE: "source" };
 export const SEPARATOR = "?";
 
 export default function AutoField(props) {
-  if (props.option.dataSource) {
-    return <DataSourceField {...props.option} />;
+
+  let option = {...props.option}
+  if(props.prefix) {
+    console.log("AutoField Option", props.option, props.prefix)
+    option = {...option, label:`${props.prefix}${option.label}`}
+  }
+
+  if (option.dataSource) {
+    return <DataSourceField {...option} />;
   }
 
   switch (props.option.type) {
     case "float":
-      return <FloatField {...props.option} />;
+      return <FloatField {...option} />;
     case "text":
-      return <TextField {...props.option} />;
+      return <TextField {...option} />;
     case "choice":
-      return <ChoiceField {...props.option} />;
+      return <ChoiceField {...option} />;
+    default:
+      return <p>No field configured for type "{option.type}"</p>
   }
 }
+
+
 
 
 function FloatField(props) {
   return (
     <div className="col-12">
-      <label htmlFor={props.label}>{props.verbose}</label>
+      <FormLabel htmlFor={props.label}>{props.verbose}</FormLabel>
       <Field
         id={props.label}
         name={props.label}
@@ -34,6 +45,13 @@ function FloatField(props) {
         className="form-control"
       />
     </div>
+  );
+}
+export function FormLabel({ htmlFor, children }) {
+  return (
+    <label className="px-2 mb-1" htmlFor={htmlFor}>
+      {children}
+    </label>
   );
 }
 
@@ -71,32 +89,61 @@ function DataSourceLinkField({ label, source }) {
   }
 }
 
+
+function getInitialSource(label, fieldValues) {
+  const split = label.split(".")
+  if (split.length > 1) {
+    // split is ["overall label", "index", "inner label"]
+    var value = fieldValues[split[0]][parseInt(split[1])][split[2] + SEPARATOR + sources.SOURCE]
+
+    } else {
+      var value = fieldValues[split[0] + SEPARATOR + sources.SOURCE]
+
+    }
+
+  return value
+
+}
+
+
 function DataSourceField(props) {
-  const [source, setSource] = useState(sources.CONSTANT);
+  const [field, meta, helpers] = useField(props);
+  const [source, setSource] = useState(getInitialSource(props.label, field.value));
+
+
+  console.log("field, meta, helpers",field, meta, helpers)
+  console.log("datasource props", props)
+  console.log("getInitialSource", field.value, getInitialSource(props.label, field.value))
+
+
+  const handleValueChange = useCallback((e) => {
+    console.log("onClick", e.target);
+    setSource(e.target.value);
+  }, [setSource])
+
   console.log("source", source);
 
   //    {getSourceHTML(source)}
   //{source == "constant" && <Field id="urlInput" name={props.label} placeholder="Constant" className="form-control col-8" />}
   return (
     <div className="col-12">
-      <label htmlFor="input-group">{[props.verbose]}</label>
+      <FormLabel htmlFor="input-group">{[props.verbose]}</FormLabel>
       <div id="input-group" className="row p-0 g-3">
         <div className="col-md-4">
           <div className="input-group">
             <div className="input-group-text">Source</div>
             <Field
+
               as="select"
               name={props.label + SEPARATOR + sources.SOURCE}
               id="sourceSwitch"
               className="form-select col-2"
-              onClick={(e) => {
-                console.log("onClick");
-                setSource(e.target.value);
-              }}
+              onClick={handleValueChange}
+
             >
-              <option value="constant">Constant</option>
-              <option value="http">HTTP Request</option>
-              <option value="ws">Websocket Channel</option>
+              <option value={sources.CONSTANT}>Constant</option>
+              <option value={sources.HTTP}>HTTP Request</option>
+              <option value={sources.WS}>Websocket Channel</option>
             </Field>
           </div>
         </div>
@@ -117,7 +164,7 @@ function DataSourceField(props) {
 function TextField(props) {
   return (
     <div className="col-12">
-      <label htmlFor={props.label}>{props.verbose}</label>
+      <FormLabel htmlFor={props.label}>{props.verbose}</FormLabel>
       <Field
         id={props.label}
         name={props.label}
@@ -131,7 +178,7 @@ function TextField(props) {
 function ChoiceField(props) {
   return (
     <div className="col-12">
-      <label htmlFor={props.label}>{props.verbose}</label>
+      <FormLabel htmlFor={props.label}>{props.verbose}</FormLabel>
       <Field id={props.label} name={props.label} as="select" className="form-select">
         {props.choices.map((choice) => (
           <option key={choice} value={choice}>

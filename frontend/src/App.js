@@ -23,6 +23,8 @@ import "./Styles/App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle";
 import "./Styles/Shoestring.css";
+import '/node_modules/react-grid-layout/css/styles.css'
+import '/node_modules/react-resizable/css/styles.css'
 
 import {
   ConfiguratorForm as ConfiguratorFormSingle,
@@ -37,6 +39,8 @@ import BuildingBlockWrapperMulti from "multivar/BuildingBlockWrapperMulti";
 
 import { ConfiguratorFormMulti, DataSourceComponentMulti } from "multivar/ConfigurableDataSource";
 import Checklist from "BuildingBlocks/Checklist";
+import GlobalConfigurator from "global-config/GlobalConfigurator";
+import ReactGridLayoutDemo from "global-config/ReactGridLayoutDemo";
 
 ReactModal.setAppElement(document.getElementById("root"));
 
@@ -58,6 +62,8 @@ function AppContent(props) {
     { id: "page4", page: Page4, icon: Icon.PencilSquare, title: "Configurable Card" },
     { id: "page5", page: Page5, icon: Icon.PlugFill, title: "Data Source Config" },
     { id: "page6", page: Page6, icon: Icon.Plugin, title: "Multi Data Config" },
+    { id: "page7", page: Page7, icon: Icon.Globe, title: "Global Configuration" },
+    { id: "page8", page: Page8, icon: Icon.ColumnsGap, title: "Grid Layout Demo" },
   ];
 
   const [currentPage, setCurrentPage] = useState(() => {
@@ -328,6 +334,35 @@ function Page6() {
         <pre>{stringify(content.options)}</pre>
       </Card>
     </Fragment>
+  );
+}
+
+function Page7() {
+  // Aim is to have a single JSON file here which records the config for all BBs
+  // Eventually would want to read and save these on a backend, but for now, use Local Storage
+  // Initial wrapper for global config:
+  //    - View JSON Config as it is made
+  //    - Add Building Blocks (assign UUID to each)
+  //    - Pull forms from those building block instances 
+  //    - Save configs in local storage {configKey: {bbID1: {bbConfig}, bbID2: {bbConfig}}}
+  
+
+  const content = LineChartMultiInput;
+  const [contentConfig, setContentConfig] = useState(addDefaultSourceValues(content.options));
+
+  return (
+    <GlobalConfigurator/>
+  );
+}
+
+function Page8() {
+
+  const content = LineChartMultiInput;
+  const [contentConfig, setContentConfig] = useState(addDefaultSourceValues(content.options));
+
+  return (
+    <ReactGridLayoutDemo/>
+    
   );
 }
 

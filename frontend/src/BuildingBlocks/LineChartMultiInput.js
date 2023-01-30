@@ -1,3 +1,4 @@
+import BuildingBlockOptions from "Classes/BuildingBlockOptions";
 import React, { Fragment, useEffect, useState } from "react";
 import {
   LineChart as Chart,
@@ -90,6 +91,8 @@ LineChartMultiInput.options = Object.freeze([
   { label: "refText", verbose: "Reference Line Text", initial: "Default Overall Name", type: "text" },
 ]);
 
+
+LineChartMultiInput.optionsClass = new BuildingBlockOptions(LineChartMultiInput.options)
 /*
 const egDataSourceConfig = {
       label: "dataSeries",

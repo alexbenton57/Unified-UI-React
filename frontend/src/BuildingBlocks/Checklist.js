@@ -3,6 +3,7 @@ import * as Icon from "react-bootstrap-icons";
 import * as Yup from "yup";
 import { Formik, Field, Form } from "formik";
 import { v4 as uuid } from "uuid";
+import BuildingBlockOptions from "Classes/BuildingBlockOptions";
 const axios = require('axios').default;
 
 function getInitialVals(items) {
@@ -191,3 +192,5 @@ Checklist.options = [
     type: "text",
   },
 ];
+
+Checklist.optionsClass = new BuildingBlockOptions(Checklist.options)
