@@ -3,7 +3,9 @@ import Accordion from "react-bootstrap/Accordion";
 
 import BuildingBlockForm from "global-config/BuildingBlockForm";
 import LayoutConfigurator from "./LayoutConfigurator";
+import LocalStorageForm from "./LocalStorageForm";
 
+// Building Blocks
 import LineChartMultiInput from "BuildingBlocks/LineChartMultiInput";
 import LineChartTwoInput from "BuildingBlocks/LineChartTwoInput";
 import Checklist from "BuildingBlocks/Checklist";
@@ -13,9 +15,7 @@ import { v4 as uuid } from "uuid";
 import { Formik, Field, Form } from "formik";
 import stringify from "Utils/stringify";
 import { FormLabel } from "Infrastructure/AutoField";
-import { getFromLS, setToLS } from "Utils/localStorage";
-import { useRef } from "react";
-import slugify from "Utils/slugify";
+
 import * as Icon from "react-bootstrap-icons";
 import useLogOnChange from "Hooks/useLogOnChange";
 
@@ -39,22 +39,18 @@ export default function GlobalConfigurator() {
   const [globalConfig, setGlobalConfig] = useState({});
   const [focussed, setFocussed] = useState("");
 
-  useLogOnChange(focussed, "focussed");
-
   return (
     <Fragment>
       <div className="col-7">
         <div className="card card-two-third mb-3 ">
-          <div className="card-header">Layout Preview</div>
 
-          <div className="card-body">
             <LayoutConfigurator
               globalConfig={globalConfig}
               setGlobalConfig={setGlobalConfig}
               focussed={focussed}
               setFocussed={setFocussed}
             />
-          </div>
+
         </div>
         <div className="card card-third">
           <div className="card-header">Global Configuration</div>
@@ -95,87 +91,6 @@ function JSONPreview({ globalConfig, focussed }) {
   );
 }
 
-function LocalStorageForm({ globalConfig, setGlobalConfig }) {
-  const ALLCONFIGKEYS = "all-config-keys";
-  const [configKeys, setConfigKeys] = useState(
-    getFromLS(ALLCONFIGKEYS) ? getFromLS(ALLCONFIGKEYS) : []
-  );
-  const saveFieldRef = useRef();
-  const loadFieldRef = useRef();
-
-  const save = useCallback(
-    (e) => {
-      const newKey = slugify(saveFieldRef.current.value);
-      console.log("setToLS", newKey, globalConfig);
-      setToLS(newKey, globalConfig);
-
-      const newConfigKeys = [...configKeys, newKey].filter((value, index, self) => {
-        // Only unique values
-        return self.indexOf(value) === index;
-      });
-
-      setConfigKeys(newConfigKeys);
-      setToLS(ALLCONFIGKEYS, newConfigKeys);
-    },
-    [setConfigKeys, globalConfig, saveFieldRef]
-  );
-
-  const load = useCallback(
-    (e) => {
-      setGlobalConfig(getFromLS(loadFieldRef.current.value));
-    },
-    [setGlobalConfig]
-  );
-
-  return (
-    <Fragment>
-      <div className="col-12">
-        <div className="row p-3 g-3">
-          <div className="col-md-6">
-            <div className="input-group">
-              <div className="input-group-text">Name</div>
-              <input
-                ref={saveFieldRef}
-                type="text"
-                className="form-control"
-                placeholder="Configuration Name"
-              />
-              <button type="button" className="btn btn-primary" onClick={save}>
-                Save
-              </button>
-            </div>
-          </div>
-          <div className="col-md-6">
-            <div className="input-group">
-              <select className="form-select" ref={loadFieldRef}>
-                <option selected>...</option>
-                {configKeys.map((key) => (
-                  <option value={key} key={key}>
-                    {key}
-                  </option>
-                ))}
-              </select>{" "}
-              <button type="button btn-outline" className="btn btn-outline-primary" onClick={load}>
-                Load
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Fragment>
-  );
-}
-
-const exampleGlobalConfig = {
-  uuid: {
-    ...{ configAsBefore: "" },
-    id: "uuid",
-    title: "bb",
-    width: 4,
-    height: 2,
-  },
-};
-
 function BuildingBlockAccordion({ globalConfig, setGlobalConfig, focussed, setFocussed }) {
   const setBBConfig = useCallback(
     (newConf) => {
@@ -197,14 +112,15 @@ function BuildingBlockAccordion({ globalConfig, setGlobalConfig, focussed, setFo
   const newBB = useCallback(() => {
     const bbID = uuid();
     setGlobalConfig((prev) => ({ ...prev, [bbID]: { id: bbID } }));
-  }, [setGlobalConfig]);
+    setFocussed(bbID)
+  }, [setGlobalConfig, setFocussed]);
 
   useLogOnChange(globalConfig, "globalConfig remove");
 
   return (
     <Accordion bsPrefix="accordion accordion-flush border-top" activeKey={focussed}>
       {Object.values(globalConfig).map((bbConfig) => (
-        <AccordionElement
+        <BuildingBlockAccordionElement
           key={bbConfig.id}
           bbID={bbConfig.id}
           setBBConfig={setBBConfig}
@@ -226,7 +142,7 @@ function BuildingBlockAccordion({ globalConfig, setGlobalConfig, focussed, setFo
   );
 }
 
-function AccordionElement({ bbConfig, setBBConfig, removeBBConfig, bbID, setFocussed, focussed }) {
+function BuildingBlockAccordionElement({ bbConfig, setBBConfig, removeBBConfig, bbID, setFocussed, focussed }) {
   console.log("render AccordionElement", bbConfig, setBBConfig, bbID);
   const [bbType, setBBType] = useState(
     bbConfig?.bbType in allBuildingBlocks ? bbConfig.bbType : null

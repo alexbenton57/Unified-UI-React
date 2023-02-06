@@ -1,25 +1,10 @@
-import React, { Fragment, useState, useCallback } from "react";
+import React, { Fragment, useState, useCallback, useLayoutEffect } from "react";
 import GridLayout from "react-grid-layout";
 
-import Accordion from "react-bootstrap/Accordion";
-import ConfiguratorForm from "multivar/ConfiguratorForm";
-import BuildingBlockForm from "global-config/BuildingBlockForm";
-
-import LineChartMultiInput from "BuildingBlocks/LineChartMultiInput";
-import LineChartTwoInput from "BuildingBlocks/LineChartTwoInput";
-import Checklist from "BuildingBlocks/Checklist";
-import ProgressBar from "BuildingBlocks/ProgressBar";
-
-import { v4 as uuid } from "uuid";
-import { Formik, Field, Form } from "formik";
-import stringify from "Utils/stringify";
-import { FormLabel } from "Infrastructure/AutoField";
-import { getFromLS, setToLS } from "Utils/localStorage";
 import { useRef } from "react";
-import slugify from "Utils/slugify";
 import * as Icon from "react-bootstrap-icons";
-import useLogOnChange from "Hooks/useLogOnChange";
 import { useEffect } from "react";
+import useElementSize from "Hooks/useElementSize";
 
 function getInitialLayout(config) {
   const defaultLayout = {};
@@ -29,6 +14,8 @@ function getInitialLayout(config) {
       : { i: bbConfig.id, x: 0, y: 0, w: 2, h: 2 }
   );
 }
+
+
 
 export default function LayoutConfigurator({
   globalConfig,
@@ -42,6 +29,13 @@ export default function LayoutConfigurator({
     setLayout(getInitialLayout(globalConfig));
   }, [globalConfig, setLayout]);
 
+  const layoutContainerRef = useRef(null);
+
+  const [rows, setRows] = useState(8);
+  const {width, height} = useElementSize(layoutContainerRef)
+
+
+
   const saveLayout = useCallback((layout) => {
     setGlobalConfig((prev) => {
       var newConf = {};
@@ -54,42 +48,60 @@ export default function LayoutConfigurator({
     });
   });
 
-  const toggleFocussed = useCallback(() => {
-    if (focussed === bbID) {
-      setFocussed("");
-    } else {
-      setFocussed(bbID);
-    }
-  }, [focussed, setFocussed]);
+  const toggleFocussed = useCallback(
+    (bbID) => {
+      if (focussed === bbID) {
+        setFocussed("");
+      } else {
+        setFocussed(bbID);
+      }
+    },
+    [focussed, setFocussed]
+  );
 
   return (
-    <GridLayout
-      className="layout border overflow-auto"
-      cols={12}
-      width={800}
-      layout={layout}
-      rowHeight={800 / 12}
-      maxRows={8}
-      onLayoutChange={(layout) => saveLayout(layout)}
-    >
-      {Object.values(globalConfig).map((bbConfig) => (
-        <div
-          key={bbConfig.id}
-          className={`border rounded overflow-hidden p-2 ${
-            bbConfig.id === focussed ? "bg-light card-shadow" : ""
-          }`}
-          onClick={(e) => {
-            console.log("onClick", e);
-            if (focussed === bbConfig.id) {
-              setFocussed("");
-            } else {
-              setFocussed(bbConfig.id);
-            }
-          }}
-        >
-          <p>{bbConfig.title}</p>
+    <Fragment>
+      <div className="card-header d-flex justify-content-between">
+        <span>Layout Preview</span>
+        <span className="m-0">
+          <span>Rows</span>
+          <span className="ms-2">
+            <Icon.DashLg role="button" onClick={() => setRows((p) => p - 1)} />
+          </span>
+          <span className="mx-2">{rows}</span>
+          <span>
+            <Icon.PlusLg role="button" onClick={() => setRows((p) => p + 1)} />
+          </span>
+        </span>
+      </div>
+
+      <div className="card-body">
+        <div className="h-100 w-100" ref={layoutContainerRef}>
+          <GridLayout
+            className="p-0 h-100 layout overflow-hidden"
+            cols={12}
+            width={width}
+            layout={layout}
+            margin={[10, 10]}
+            rowHeight={(height - (rows + 1) * 10) / rows}
+            maxRows={rows}
+            isBounded={true}
+            onLayoutChange={(layout) => saveLayout(layout)}
+          >
+            {Object.values(globalConfig).map((bbConfig) => (
+              <div
+                key={bbConfig.id}
+                className={`border rounded overflow-hidden p-2 ${
+                  bbConfig.id === focussed ? "bg-light card-shadow" : ""
+                }`}
+                onClick={(e) => toggleFocussed(bbConfig.id)}
+              >
+                <p>{bbConfig.title}</p>
+              </div>
+            ))}
+          </GridLayout>
         </div>
-      ))}
-    </GridLayout>
+      </div>
+    </Fragment>
   );
 }

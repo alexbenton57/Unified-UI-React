@@ -107,21 +107,14 @@ function getInitialSource(label, fieldValues) {
 
 
 function DataSourceField(props) {
-  const [field, meta, helpers] = useField(props);
+  const [field, meta, helpers] = useField(props.label);
   const [source, setSource] = useState(getInitialSource(props.label, field.value));
 
-
-  console.log("field, meta, helpers",field, meta, helpers)
-  console.log("datasource props", props)
-  console.log("getInitialSource", field.value, getInitialSource(props.label, field.value))
-
-
   const handleValueChange = useCallback((e) => {
-    console.log("onClick", e.target);
+
     setSource(e.target.value);
   }, [setSource])
 
-  console.log("source", source);
 
   //    {getSourceHTML(source)}
   //{source == "constant" && <Field id="urlInput" name={props.label} placeholder="Constant" className="form-control col-8" />}

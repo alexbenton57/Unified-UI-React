@@ -7,13 +7,12 @@ import AutoField, {
   SEPARATOR,
   websocketChannels,
   FormLabel,
-} from "Infrastructure/AutoField";
+} from "global-config/AutoField";
+
 import Accordion from "react-bootstrap/Accordion";
-import useLogOnChange from "Hooks/useLogOnChange";
-import { string } from "yup";
+
 import DataSource from "Classes/DataSource";
 
-import AccordionMultiField from "multivar/AccordionMultiField";
 import stringify from "Utils/stringify";
 
 // Modified from multivar/ConfiguratorForm
@@ -21,30 +20,9 @@ import stringify from "Utils/stringify";
 // input vars: options - derived from BB Definition
 //             existing/initial values - derived
 
-function getInitialValuesOld(options, existingConfig, bbID, bbType) {
-  let initialValues = {};
-
-  options.map((option) => {
-    if (option.multiple) {
-      initialValues[option.label] = [];
-    } else {
-      initialValues = addInitialValue(initialValues, option);
-    }
-  });
-
-  initialValues.id = bbID;
-  initialValues.bbType = bbType;
-
-  return initialValues;
-}
-
 function addInitialValue(initialValues, option, prefix = "") {
   if (option.dataSource) {
-    initialValues[prefix + option.label + SEPARATOR + sources.CONSTANT] = "";
-    initialValues[prefix + option.label + SEPARATOR + sources.HTTP] =
-      "http://localhost:8000/datums/?name=datum1&history=7";
-    initialValues[prefix + option.label + SEPARATOR + sources.WS] = websocketChannels[0];
-    initialValues[prefix + option.label + SEPARATOR + sources.SOURCE] = sources.CONSTANT;
+    initialValues[prefix + option.label] = { type: sources.CONSTANT, link: "" };
   } else {
     initialValues[prefix + option.label] = "";
   }
@@ -54,33 +32,35 @@ function addInitialValue(initialValues, option, prefix = "") {
 
 function getInitialValues(options, existingConfig, bbID, bbType) {
   let initialValues = {};
-  console.log("option", options, options.filter(o => !o.omittedFromForm))
-  options.filter(o => !o.omittedFromForm).map((option) => {
-    const label = option.label;
-    if (option.multiple) {
+  console.log(
+    "option",
+    options,
+    options.filter((o) => !o.omittedFromForm)
+  );
+  options
+    .filter((o) => !o.omittedFromForm)
+    .map((option) => {
+      const label = option.label;
+      if (option.multiple) {
+        if (existingConfig?.[label]?.length > 0) {
+          initialValues[option.label] = existingConfig[label].map((innerConfigObj) => {
+            var initialInnerValues = {};
+            option.options.map((innerOption) => {
+              initialInnerValues = {
+                ...initialInnerValues,
+                ...makeInitialValue(innerOption, innerConfigObj[innerOption.label]),
+              };
+            });
 
-      if (existingConfig?.[label]?.length > 0) {
-        initialValues[option.label] = existingConfig[label].map((innerConfigObj) => {
-
-          var initialInnerValues = {};
-          option.options.map((innerOption) => {
-            initialInnerValues = {
-              ...initialInnerValues,
-              ...makeInitialValue(innerOption, innerConfigObj[innerOption.label]),
-            };
+            return initialInnerValues;
           });
-
-          return initialInnerValues
-        });
-
+        } else {
+          initialValues[label] = [];
+        }
       } else {
-        initialValues[option.label] = [];
+        initialValues = { ...initialValues, ...makeInitialValue(option, existingConfig[label]) };
       }
-
-    } else {
-      initialValues = { ...initialValues, ...makeInitialValue(option, existingConfig[label]) };
-    }
-  });
+    });
 
   initialValues.id = bbID;
   initialValues.bbType = bbType;
@@ -99,17 +79,13 @@ function makeInitialValue(option, prev) {
 
   if (option.dataSource) {
     const type = prev?.type || sources.CONSTANT;
-    newObj[option.label + SEPARATOR + sources.SOURCE] = type;
-
-    Object.entries(defaultValues).map(([sourceType, defaultValue]) => {
-      console.log(" Object.entries(defaultValues).map(([sourceType, defaultValue])", sourceType, defaultValue)
-      const link = (prev?.type === sourceType) ? (prev?.link || defaultValue) : defaultValue;
-      newObj[option.label + SEPARATOR + sourceType] = link;
-    });
+    const link = prev?.link || defaultValues[type];
+    newObj[option.label] = { type: type, link: link };
+  } else if (option.type === "choice") {
+    newObj[option.label] = prev || option.choices?.[0] || "";
   } else {
     newObj[option.label] = prev || "";
   }
-  console.log("makeInitialValue(option, prev) => newConf", option, prev, newObj)
   return newObj;
 }
 
@@ -124,41 +100,11 @@ export default function BuildingBlockForm({ bbID, bbType, options, setBBConfig, 
   const initialValues = getInitialValues(options, existingConfig, bbID, bbType);
   console.log("Building Block Options", options, bbID, initialValues);
 
-  const handleSubmit = useCallback(
-    (values) => {
-      var newConfig = {};
-
-      options.map((option) => {
-        if (option.multiple) {
-          newConfig[option.label] = values[option.label].map((innerValues) => {
-            let innerValueObj = {};
-            option.options.map((innerOpt) => {
-              if (innerOpt.dataSource) {
-                innerValueObj[innerOpt.label] = dataSourceFromForm(innerOpt, innerValues);
-              } else {
-                innerValueObj[innerOpt.label] = innerValues[innerOpt.label];
-              }
-            });
-            return innerValueObj;
-          });
-
-          values[option.label];
-        } else if (option.dataSource) {
-          newConfig[option.label] = dataSourceFromForm(option, values);
-        } else {
-          newConfig[option.label] = values[option.label];
-        }
-      });
-      console.log("newConfig", newConfig);
-      setBBConfig(newConfig);
-    },
-    [setBBConfig, options]
-  );
-
   return (
-    <Formik initialValues={initialValues} onSubmit={(values) => handleSubmit(values)}>
+    <Formik initialValues={initialValues} onSubmit={(values) => setBBConfig(values)}>
       {({ values, errors, touched, handleReset }) => (
         <Form className="row gy-3">
+          {console.log("values", values)}
           {options.map((option) => {
             if (!option.omittedFromForm) {
               if (option.multiple) {
@@ -207,7 +153,6 @@ function AccordionField({ option, arrayHelpers }) {
               </Accordion.Button>
 
               <Accordion.Body>
-                {console.log("option.options", option.options)}
                 {option.options.map((innerOption, j) => (
                   <AutoField key={j} option={innerOption} prefix={`${option.label}.${i}.`} />
                 ))}

@@ -9,47 +9,44 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  ReferenceLine
+  ReferenceLine,
 } from "recharts";
 
-export default function LineChartMultiInput({data, refValue, refText}) {
-
+export default function LineChartMultiInput({ data, refValue, refText }) {
   const labels = ["January", "February", "March", "April", "May", "June", "July"];
 
   function getData() {
     const range = [...Array(7).keys()];
     const newData = range.map((i) => {
-        const propsData = {}
-        data.forEach(obj => propsData[obj.key] = obj.data[i])
+      const propsData = {};
+      data.forEach((obj) => (propsData[obj.key] = obj.data[i]));
 
       return { ...propsData, ["name"]: labels[i] };
     });
     return newData;
   }
-  
-  const colours = ["red", "green", "blue", "pink", "purple"]
+
+  const colours = ["red", "green", "blue", "pink", "purple"];
+  const margins = { top: 5, right: 5, left: 5, bottom: 5 };
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <Chart
-        width={500}
-        height={300}
-        data={getData()}
-        margin={{
-          top: 5,
-          right: 5,
-          left: 5,
-          bottom: 5,
-        }}
-      >
+      <Chart width={500} height={300} data={getData()} margin={margins}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
         <YAxis />
         <Tooltip />
         <Legend />
         <ReferenceLine y={refValue} stroke="green" label={refText} />
-        {data.map((obj, i) => <Line name={obj.name} key={obj.key} type={obj.lineType} dataKey={obj.key} color={colours[i]}/>)}
-
+        {data.map((obj, i) => (
+          <Line
+            name={obj.name}
+            key={obj.key}
+            type={obj.lineType}
+            dataKey={obj.key}
+            color={colours[i]}
+          />
+        ))}
       </Chart>
     </ResponsiveContainer>
   );
@@ -59,7 +56,6 @@ export default function LineChartMultiInput({data, refValue, refText}) {
 const typeChoices = ["basis", "linear", "natural", "monotone", "step"];
 
 LineChartMultiInput.options = Object.freeze([
-  
   // Multi option - [text datasource, text, and a choice]
   {
     label: "data",
@@ -88,11 +84,15 @@ LineChartMultiInput.options = Object.freeze([
   },
 
   // Simple option - text
-  { label: "refText", verbose: "Reference Line Text", initial: "Default Overall Name", type: "text" },
+  {
+    label: "refText",
+    verbose: "Reference Line Text",
+    initial: "Default Overall Name",
+    type: "text",
+  },
 ]);
 
-
-LineChartMultiInput.optionsClass = new BuildingBlockOptions(LineChartMultiInput.options)
+LineChartMultiInput.optionsClass = new BuildingBlockOptions(LineChartMultiInput.options);
 /*
 const egDataSourceConfig = {
       label: "dataSeries",
