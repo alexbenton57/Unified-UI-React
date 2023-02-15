@@ -29,6 +29,20 @@ class ValueHistorySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ValueHistory
         fields = ['value', 'time']
+class MachineLogSerializer(serializers.HyperlinkedModelSerializer):
+        
+    class Meta:
+        model = MachineLog
+        fields = ['id', 'text', 'status', 'time_created']
+                
+class MachineSerializer(serializers.HyperlinkedModelSerializer):
+    
+    log = MachineLogSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Machine
+        fields = ['name', 'verbose', 'status', 'log']
+
         
 class ChecklistItemSerializer(serializers.HyperlinkedModelSerializer):
     

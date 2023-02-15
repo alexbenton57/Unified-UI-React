@@ -28,6 +28,8 @@ class Messenger extends EventTarget {
   emit(tag, data) {
     const newEvent =
       data !== undefined ? new CustomEvent(tag, { detail: data }) : new CustomEvent(tag);
+
+    
     this.dispatchEvent(newEvent);
   }
 

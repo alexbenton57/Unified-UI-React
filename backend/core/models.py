@@ -70,3 +70,32 @@ class ChecklistItem(models.Model):
     
 
     
+class Machine(models.Model):
+    name = models.CharField(primary_key=True, max_length=50, unique=True)
+    verbose = models.CharField(max_length=50, blank=True)
+    status = models.BooleanField()
+    
+    
+    def __str__(self):
+        return self.name + ": " + str(self.status)
+    
+    def update(self, status, text):
+        self.status = status
+        self.save()
+        print("Machine Updated", status, text, self)
+        
+        newItem = MachineLog(text=text, machine=self, status=status)
+        newItem.save()
+        
+    
+        
+class MachineLog(models.Model):
+    id = models.BigAutoField(primary_key=True, unique=True, editable=False)
+    status = models.BooleanField()
+    text = models.TextField()
+    time_created = models.DateTimeField(auto_now_add=True)
+    machine = models.ForeignKey(Machine, related_name="log", on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return self.text + str(self.time_created)    
+    

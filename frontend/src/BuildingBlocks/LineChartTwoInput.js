@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { LineChart as Chart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import BuildingBlockOptions from "Classes/BuildingBlockOptions";
-export default function LineChartTwoInput({ dataSeries1, dataSeries2, lineType, seriesName1, seriesName2 }) {
+export default function LineChartTwoInput({ dataSeries1, dataSeries2, lineType, seriesName1, seriesName2, twoDataSeries }) {
 
     console.log("render - LineChart", lineType)
 
@@ -37,7 +37,7 @@ export default function LineChartTwoInput({ dataSeries1, dataSeries2, lineType, 
                 <Tooltip />
                 <Legend />
                 <Line name={seriesName1} type={lineType} dataKey="Series1" stroke="#8884d8" activeDot={{ r: 8 }} />
-                <Line name={seriesName2} type={lineType} dataKey="Series2" stroke="#82ca9d" />
+                {twoDataSeries && <Line name={seriesName2} type={lineType} dataKey="Series2" stroke="#82ca9d" />}
             </Chart>
 
         </ResponsiveContainer >
@@ -49,15 +49,13 @@ export default function LineChartTwoInput({ dataSeries1, dataSeries2, lineType, 
 
 LineChartTwoInput.options = Object.freeze([
     // labels alphanumeric only
-    { label: "dataSeries1", verbose: "Series 1 Data", initial: [], type: "array", dataSource: true },
-    { label: "seriesName1", verbose: "Series 1 Name", initial: "Series 1", type: "text" },
-    { label: "dataSeries2", verbose: "Series 2 Data", initial: [], type: "array", dataSource: true },
-    { label: "seriesName2", verbose: "Series 2 Name", initial: "Series 2", type: "text" },
-    { label: "lineType", verbose: "Line Type", initial: "basis", type: "choice", choices: ['basis', 'linear', 'linearClosed', 'natural', 'monotone', 'step'] },
+    { name: "twoDataSeries", verbose: "Two Data Series", defaultValue: true, fieldType: "boolean"},
+    { name: "dataSeries1", verbose: "Series 1 Data",   fieldType: "dataSource", required:true },
+    { name: "seriesName1", verbose: "Series 1 Name", defaultValue: "Series 1", fieldType: "input" },
+    { name: "dataSeries2", verbose: "Series 2 Data", enabledBy:"twoDataSeries", fieldType: "dataSource", required: true },
+    { name: "seriesName2", verbose: "Series 2 Name", enabledBy:"twoDataSeries", defaultValue: "Series 2", fieldType: "input" },
+    { name: "lineType", verbose: "Line Type", initial: "basis", fieldType: "choice", choices: ['basis', 'linear', 'linearClosed', 'natural', 'monotone', 'step'] },
 
-
-
-    //{ label: "multiSeries", verbose: "Multi Series Data", type: "float", initial: 0, dataSource: true, multiple: true },
 
 ])
 

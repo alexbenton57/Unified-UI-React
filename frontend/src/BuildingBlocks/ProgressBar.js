@@ -48,7 +48,6 @@ export default function ProgressBar(props) {
 
     return (
         <Fragment>
-            {console.log("render = ConfigurableComponent", props)}
 
             {progressBar(value, props.redEnd, props.yellowEnd, props.greenColor)}
             <p>Progress Bar Value: {value}</p>
@@ -57,10 +56,10 @@ export default function ProgressBar(props) {
 }
 
 ProgressBar.options = Object.freeze([
-    { label: "redEnd", verbose: "Red End Boundary", initial: 10, type: "float" },
-    { label: "yellowEnd", verbose: "Yellow End Boundary", initial: 50, type: "float" },
-    { label: "greenColor", verbose: "End Zone Colour", initial: "danger", type: "choice", choices: ["danger", "success", "warning"] },
-    { label: "socketChannel", verbose: "Web Socket Channel", initial: "100", type: "choice", choices: ["100", "channel1", "channel2"] },
+    { name: "redEnd", verbose: "Red End Boundary", defaultValue: 10, fieldType: "input" },
+    { name: "yellowEnd", verbose: "Yellow End Boundary", defaultValue: 50, fieldType: "input" },
+    { name: "greenColor", verbose: "End Zone Colour", defaultValue: "danger", fieldType: "choice", choices: ["danger", "success", "warning"] },
+    { name: "socketChannel", verbose: "Web Socket Channel", defaultValue: "100", fieldType: "choice", choices: ["100", "channel1", "channel2"] },
 ])
 // 
 

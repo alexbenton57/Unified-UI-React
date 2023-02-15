@@ -32,7 +32,9 @@ export default function LocalStorageForm({ globalConfig, setGlobalConfig }) {
   
     const load = useCallback(
       (e) => {
+        
         if (loadFieldRef.current.value !== "defaultOption"){
+          console.log("loading config", getFromLS(loadFieldRef.current.value))
         setGlobalConfig(getFromLS(loadFieldRef.current.value));
       }},
       [setGlobalConfig]

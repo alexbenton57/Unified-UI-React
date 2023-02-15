@@ -1,32 +1,35 @@
 import axios from "axios";
-import { sources } from "../Infrastructure/AutoField";
+import { DATA_SOURCES } from "CONSTANTS";
 import { v4 as uuid } from "uuid";
 
 export default class DataSource {
-  constructor(type, link, label, initial) {
-    console.log("Initialising");
+  constructor(type, link, label) {
+    console.log("render - new Datasource", label)
     this.type = type;
     this.link = link;
     this.label = label;
-    this.initial = initial;
+    this.name = label;
+    this.dataSourceID = uuid()
     this.refresh();
   }
 
   refresh() {
-    if (this.type === sources.HTTP) {
+    if (this.type === DATA_SOURCES.HTTP) {
+      console.log("Refreshing Datasource", this.dataSourceID)
       this.promiseUUID = uuid();      
       this.axiosPromise = this.wrapAxiosPromise(this.link);
 
-      console.log("Refreshing HTTP Promise", this);
+      //console.log("Making/Refreshing HTTP Promise", this);
     }
   }
 
   processResult(res) {
 
       try {
+        console.log("Processing Result", res)
         return res.results.map((r) => r.value);
       } catch (error) {
-        console.log("Process Result Error", error)
+        console.log("Process Result Error", error, res)
         return res;
       }
 
@@ -34,6 +37,7 @@ export default class DataSource {
   }
 
   wrapAxiosPromise(url) {
+    console.log("Wrapping Axios Promise Datasource")
     const process = this.processResult;
     const outerThis = this
 
@@ -48,12 +52,17 @@ export default class DataSource {
 
     let suspend = promise()
       .then((res) => {
-        console.log("HTTP Result", res);
+        console.log("HTTP Result", res, res.request?.status);
 
-        switch (res.status) {
+        switch (res.request?.status) {
           case 200:
             status = "success";
             result = res;
+            break;
+          case 0:
+            status = "error";
+            result = res;
+            console.log("Caught error with case 0", res)
             break;
           default:
             status = "error";
@@ -72,10 +81,10 @@ export default class DataSource {
           throw suspend;
         } else if (status === "error") {
           console.log("HTTP Error", result);
-          throw result;
+          return {status:status, result:result};
         } else if (status === "success") {
           console.log("Axios Promise Wrapper HTTP Result", result, outerThis.promiseUUID);
-          return process(result.data);
+          return {status:status, result:process(result.data)};
         }
       },
     };

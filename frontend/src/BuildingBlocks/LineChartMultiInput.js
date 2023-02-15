@@ -19,7 +19,7 @@ export default function LineChartMultiInput({ data, refValue, refText }) {
     const range = [...Array(7).keys()];
     const newData = range.map((i) => {
       const propsData = {};
-      data.forEach((obj) => (propsData[obj.key] = obj.data[i]));
+      data.forEach((obj) => (propsData[obj.name] = obj.data[i]));
 
       return { ...propsData, ["name"]: labels[i] };
     });
@@ -41,9 +41,9 @@ export default function LineChartMultiInput({ data, refValue, refText }) {
         {data.map((obj, i) => (
           <Line
             name={obj.name}
-            key={obj.key}
+            key={obj.name}
             type={obj.lineType}
-            dataKey={obj.key}
+            dataKey={obj.name}
             color={colours[i]}
           />
         ))}
@@ -57,49 +57,50 @@ const typeChoices = ["basis", "linear", "natural", "monotone", "step"];
 
 LineChartMultiInput.options = Object.freeze([
   // Multi option - [text datasource, text, and a choice]
+  { name: "twoAxes", verbose: "Use Two Axes?", defaultValue: false, fieldType: "boolean" },
   {
-    label: "data",
+    name: "data",
     verbose: "Chart Series",
-    multiple: true,
+    fieldType: "optionArray",
     options: [
-      { label: "data", verbose: "Series Data", initial: [], type: "array", dataSource: true },
-      { label: "name", verbose: "Series Name", initial: "Default Name", type: "text" },
+      { name: "data", verbose: "Series Data", fieldType: "dataSource", required: true },
+      { name: "name", verbose: "Series Name", initial: "Default Name", fieldType: "input" },
+      { name: "lineType", verbose: "Line Type", fieldType: "choice", choices: typeChoices },
       {
-        label: "lineType",
-        verbose: "Line Type",
-        initial: "monotone",
-        type: "choice",
-        choices: typeChoices,
+        name: "useRightAxis",
+        verbose: "Use Right Axis",
+        defaultValue: false,
+        fieldType: "boolean",
+        enabledBy: "twoAxes",
       },
     ],
   },
 
   // Datasource option - number
   {
-    label: "refValue",
+    name: "refValue",
     verbose: "Reference Line Value",
-    initial: 0,
-    type: "number",
-    dataSource: true,
+    defaultValue: 0,
+    fieldType: "dataSource",
   },
 
   // Simple option - text
   {
-    label: "refText",
+    name: "refText",
     verbose: "Reference Line Text",
     initial: "Default Overall Name",
-    type: "text",
+    fieldType: "input",
   },
 ]);
 
 LineChartMultiInput.optionsClass = new BuildingBlockOptions(LineChartMultiInput.options);
 /*
 const egDataSourceConfig = {
-      label: "dataSeries",
-      type: "array", // specify inner type? eg. array-float
+      name: "dataSeries",
+      dataType: "array", // specify inner type? eg. array-float
       name: "Temperature Over Time",
       initial: [0], // Maybe not required for an array - default to an empty array?
-      dataSource: true,
+      fieldType: "dataSource",
 
       source: {
         type: "ws",
@@ -111,22 +112,22 @@ const egDataSourceConfig = {
 const forMultiChartMultiVar = [
     { ...someOtherOption },
     {
-      label: "arrayOfData", // prop name
+      name: "arrayOfData", // prop name
       verbose: "Chart DataSeries",
-      multiple: true,
+      fieldType: "optionArray",
   
       options: [
-        { ...egDataSourceConfig, label: "dsLabel" },
-        { ...egNameConfig, label: "name" },
+        { ...egDataSourceConfig, name: "dsLabel" },
+        { ...egNameConfig, name: "name" },
       ],
   
       formValues: [
-        {dsLabel: {type: "ws", link: "channel"}, name:value}
+        {dsname: {fieldType: "ws", link: "channel"}, name:value}
       ]
 
       ],
     },
   ];
 
-props[overallLabel] = [{dsLabel: [...data], name:"name1"}, etc}]
+props[overallLabel] = [{dsname: [...data], name:"name1"}, etc}]
 */

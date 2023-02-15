@@ -8,7 +8,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from django.http import Http404
-
+import math
+import numpy as np
+from random import uniform
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -38,12 +40,34 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     serializer_class = CustomUserSerializer
     permission_classes = []
     
-#http://localhost:8000/datums/?name=Datum1&history=7
+class MachineLogViewSet(viewsets.ModelViewSet):
     
+    queryset = MachineLog.objects.all()
+    serializer_class = MachineLogSerializer
+    permission_classes = []
+    
+class MachineViewSet(viewsets.ModelViewSet):
+    queryset = Machine.objects.all()
+    serializer_class = MachineSerializer
+    permission_classes = []
+    
+    
+    def update(self, request, *args, **kwargs):
+        data = self.request.data
+        if ('status' in data and 'text' in data and 'machine' in data):
+            pp.pprint(data)
+            machine = Machine.objects.get(name = data['machine'])
+            machine.update(status = data['status'], text = data['text'])
+            
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            return Response("Data must be an object with 'status', 'machine' and 'text' keys", status=status.HTTP_400_BAD_REQUEST)
+    
+#http://localhost:8000/datums/?name=datum1&history=7
 class DatumViewSet(viewsets.ModelViewSet):
     
     permission_classes = []
-    
+    queryset=Datum.objects.all()
     
     def get_queryset(self):
         print(self.request.query_params)
@@ -66,8 +90,45 @@ class DatumViewSet(viewsets.ModelViewSet):
             return DatumSerializer
              
     
-    queryset = CustomUser.objects.all()
+class PowerViewSet(viewsets.ViewSet):
     
+        
+    permission_classes = []
+    def list (self, request):
+        
+        num_minutes = float(self.request.query_params.get("mins"))
+        
+        
+        # want around 60 points
+        interval = math.ceil(num_minutes)
+        time = np.arange(0, num_minutes*60, interval)
+
+        m = uniform(0.2, 1)
+        c = uniform(10, 50)
+        
+        power = [m*i + c + uniform(-5, 5) for i in range(len(time))]
+
+        
+        data = [{"time": time[i], "power": round(power[i], 2)} for i in range(len(time))]
+        return Response({"data": data}, status=status.HTTP_200_OK)
+            
+class EnergyViewSet(viewsets.ViewSet):
+    permission_classes = []
+    def list (self, request):
+        
+        num_minutes = float(self.request.query_params.get("mins"))
+        # want around 60 points
+        interval = math.ceil(num_minutes) # seconds
+        time = np.arange(0, num_minutes*60, interval)
+        
+        m = uniform(-0, -0.1)
+        c = uniform (5, 10)
+        
+        energy = [m*i + c + uniform(-0.5, 0.5) for i in range(len(time))]
+        
+        data = [{"time": time[i], "energy": round(energy[i], 3)} for i in range(len(time))]
+        return Response({"data": data}, status=status.HTTP_200_OK)
+
 class ChecklistViewSet(viewsets.ModelViewSet):
     
     permission_classes = []
@@ -123,7 +184,6 @@ class ChecklistViewSet(viewsets.ModelViewSet):
         
         #return super().create(request, *args, **kwargs)
 
-
 class ChecklistDetail(APIView):
     
     def get_object(self, pk):
@@ -172,3 +232,7 @@ router.register(r'customusers', CustomUserViewSet)
 router.register(r'datums', DatumViewSet)
 router.register(r'checklist', ChecklistViewSet)
 router.register(r'checklistitem', ChecklistItemViewSet)
+router.register(r'machine', MachineViewSet)
+router.register(r'machinelog', MachineLogViewSet)
+router.register(r'energy', EnergyViewSet, basename="energy")
+router.register(r'power', PowerViewSet, basename="power")

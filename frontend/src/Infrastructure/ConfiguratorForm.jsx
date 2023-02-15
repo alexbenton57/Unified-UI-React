@@ -21,7 +21,7 @@ export default function ConfiguratorForm({ content, setConfig }) {
     const [multiValues, setMultiValues] = useState(() => {
       const initial = {};
       content.options.map((option) => {
-        if (option.multiple) {
+        if (option.fieldType === "optionArray") {
           initial[option.label] = 1;
         }
       });
@@ -41,7 +41,7 @@ export default function ConfiguratorForm({ content, setConfig }) {
       >
         <Form className="row gy-3">
           {content.options.map((option) => {
-            if (option.multiple) {
+            if (option.fieldType === "optionArray") {
               return (
                 <AccordionMultiField
                   key={option.label}
@@ -70,7 +70,7 @@ function getFormInitialValues(options, multiValues) {
     let initialValues = {};
   
     options.map((option) => {
-      if (option.multiple) {
+      if (option.fieldType === "optionArray") {
         const range = [...Array(multiValues[option.label]).keys()];
   
         range.map((i) => {
@@ -88,7 +88,7 @@ function getFormInitialValues(options, multiValues) {
   }
   
   function addInitialValue(initialValues, option, prefix = "") {
-    if (option.dataSource) {
+    if (option.fieldType === "dataSource") {
       initialValues[prefix + option.label + SEPARATOR + sources.CONSTANT] = "";
       initialValues[prefix + option.label + SEPARATOR + sources.HTTP] =
         "http://localhost:8000/datums/?name=datum1&history=7";
@@ -107,7 +107,7 @@ function getFormInitialValues(options, multiValues) {
     var newConfig = [];
   
     content.options.map((option) => {
-      if (option.multiple) {
+      if (option.fieldType === "optionArray") {
   
         const range = [...Array(multiValues[option.label]).keys()];
         console.log("Range", range, )
@@ -130,7 +130,7 @@ function getFormInitialValues(options, multiValues) {
         });
         newConfig.push({ ...option, formValues: formValues });
       } else {
-        if (option.dataSource) {
+        if (option.fieldType === "dataSource") {
           const sourceType = values[option.label + SEPARATOR + sources.SOURCE];
           const sourceLink = values[option.label + SEPARATOR + sourceType];
           newConfig.push({ ...option, source: new DataSource(sourceType, sourceLink, option.label, option.initial) });

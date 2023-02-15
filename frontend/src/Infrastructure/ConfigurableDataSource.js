@@ -1,110 +1,40 @@
-import React, { useCallback, useEffect } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { Formik, Form } from "formik";
 
-import AutoField, { sources, SEPARATOR, websocketChannels } from "./AutoField";
 
-import Card from "./Card";
 import useLogOnChange from "Hooks/useLogOnChange";
-import BuildingBlockWrapper from "Infrastructure/BuildingBlockWrapper";
-import DataSource from "../Classes/DataSource";
+import BuildingBlockWrapperMulti from "./BuildingBlockWrapperMulti";
+import { string } from "yup";
+import DataSource from "Classes/DataSource";
 
-function getFormInitialValues(opts) {
-  const initialValues = {};
-
-  for (let option of opts) {
-    if (option.dataSource) {
-      initialValues[option.label + SEPARATOR + sources.CONSTANT] = "";
-      initialValues[option.label + SEPARATOR + sources.HTTP] =
-        "http://localhost:8000/datums/?name=datum1&history=7";
-      initialValues[option.label + SEPARATOR + sources.WS] = websocketChannels[0];
-      initialValues[option.label + SEPARATOR + sources.SOURCE] = sources.CONSTANT;
-    } else {
-      initialValues[option.label] = option.default;
-    }
-  }
-
-  return initialValues;
-}
-
-export function DataSourceComponent(props) {
+export default function DataSourceComponent(props) {
   useLogOnChange(props.config, "(render) Config passed to DataSourceComponent()");
   console.log("render - DataSourceComponent");
 
-  return (
-      <BuildingBlockWrapper content={props.content} config={props.config} />
-  );
+  return <BuildingBlockWrapperMulti content={props.content} config={props.config} />;
 }
 
-export function addDefaultSourceValues(conf) {
+export function addDefaultSourceValuesMulti(conf) {
   const config = structuredClone(conf);
 
   for (let option of config) {
-    if (option.multiple) {
-      option.formValues = []
-    } else if (option.dataSource && !("source" in option)) {
-      const link = {
+    if (option.dataSource && !("source" in option)) {
+      option.source = {
+        type: "constant",
+        link: {
           text: "",
           choice: [],
           array: [],
           float: 0,
           object: {},
-        }[option.type]
-      option.source = new DataSource(sources.CONSTANT, link, option.label, link)
-
+        }[option.type],
+      };
     }
   }
 
   return config;
 }
 
-function handleSubmit(values, contentConfig, setContentConfig) {
-  console.log("Form submitted - handleSubmit(values) triggered:", values);
-
-  var newConfig = [];
-
-  for (let option of contentConfig) {
-    if (option.dataSource) {
-      const sourceType = values[option.label + SEPARATOR + sources.SOURCE];
-      const sourceLink = values[option.label + SEPARATOR + sourceType];
-      newConfig.push({
-        ...option,
-        source: {
-          type: sourceType,
-          link: sourceLink,
-        },
-      });
-    } else {
-      newConfig.push({ ...option, value: values[option.label] });
-    }
-  }
-
-  setContentConfig(newConfig);
-}
-
-export function ConfiguratorForm(props) {
-  console.log("render - ConfiguratorForm");
-  const initialValues = getFormInitialValues(props.config);
-
-  return (
-    
-      <Formik
-        initialValues={initialValues}
-        onSubmit={(values) => handleSubmit(values, props.config, props.setConfig)}
-      >
-        <Form className="row gy-3">
-          {props.config.map((option) => (
-            <AutoField key={option.label} option={option} />
-          ))}
-          <div className="col-12">
-            <button type="submit" className="btn btn-primary my-3">
-              Submit
-            </button>
-          </div>
-        </Form>
-      </Formik>
-
-  );
-}
 
 /*
 const dataFormatNote = () => {
@@ -122,7 +52,7 @@ const dataFormatNote = () => {
       label: "indicatorValue",
       type: "float", // could also have text, float, choice, object, array
       name: "Temperature Indicator Value",
-      dataSource: true,
+      fieldType: "dataSource",
       initial: 0,
 
       // Added By Code
@@ -141,7 +71,7 @@ const dataFormatNote = () => {
       type: "array", // specify inner type? eg. array-float
       name: "Temperature Over Time",
       initial: [0], // Maybe not required for an array - default to an empty array?
-      dataSource: true,
+      fieldType: "dataSource",
 
       source: {
         type: "ws",
@@ -156,7 +86,7 @@ const dataFormatNote = () => {
     {
       label: "arrayOfArrays", // prop name
       verbose: "Chart Data",
-      dataSource: true,
+      fieldType: "dataSource",
       type: "array", // could also have text, float, choice, object, array
       multiple: true,
       initial: [null], // same value for all

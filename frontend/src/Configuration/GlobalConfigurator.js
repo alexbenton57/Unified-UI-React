@@ -1,39 +1,21 @@
-import React, { Fragment, useState, useCallback } from "react";
+import React, { Fragment, useState, useCallback, useEffect } from "react";
 import Accordion from "react-bootstrap/Accordion";
 
-import BuildingBlockForm from "global-config/BuildingBlockForm";
-import LayoutConfigurator from "./LayoutConfigurator";
-import LocalStorageForm from "./LocalStorageForm";
+import BuildingBlockForm from "Configuration/BuildingBlockForm";
+import LayoutConfigurator from "Configuration/LayoutConfigurator";
+import LocalStorageForm from "Configuration/LocalStorageForm";
 
-// Building Blocks
-import LineChartMultiInput from "BuildingBlocks/LineChartMultiInput";
-import LineChartTwoInput from "BuildingBlocks/LineChartTwoInput";
-import Checklist from "BuildingBlocks/Checklist";
-import ProgressBar from "BuildingBlocks/ProgressBar";
 
 import { v4 as uuid } from "uuid";
 import { Formik, Field, Form } from "formik";
 import stringify from "Utils/stringify";
-import { FormLabel } from "Infrastructure/AutoField";
+import { FormLabel } from "Old/AutoField";
 
 import * as Icon from "react-bootstrap-icons";
 import useLogOnChange from "Hooks/useLogOnChange";
 
-const allBuildingBlocks = {
-  "Progress Bar": ProgressBar,
-  Checklist: Checklist,
-  "Line Chart (2 Input)": LineChartTwoInput,
-  "Line Chart (Multi Input)": LineChartMultiInput,
-};
+import ALL_BUILDING_BLOCKS from "BuildingBlocks/ALL_BUILDING_BLOCKS";
 
-/* 
-            <ol>
-              <li>Add Support for loading and saving configs to local storage</li>
-              <li>Hook up existing configs to initial values </li>
-              <li>Get BB Preview working for layout config</li>
-              <li>Get a page that can load and render configs</li>
-            </ol>
-*/
 
 export default function GlobalConfigurator() {
   const [globalConfig, setGlobalConfig] = useState({});
@@ -42,7 +24,7 @@ export default function GlobalConfigurator() {
   return (
     <Fragment>
       <div className="col-7">
-        <div className="card card-two-third mb-3 ">
+        <div className="card card-two-third mb-3 card-shadow">
 
             <LayoutConfigurator
               globalConfig={globalConfig}
@@ -52,15 +34,15 @@ export default function GlobalConfigurator() {
             />
 
         </div>
-        <div className="card card-third">
+        <div className="card card-third card-shadow">
           <div className="card-header">Global Configuration</div>
-          <div className="card-body">
+          <div className="card-body" style={{overflowY: "scroll"}}>
             <JSONPreview globalConfig={globalConfig} focussed={focussed} />
           </div>
         </div>
       </div>
       <div className="col-5">
-        <div className="card card-full">
+        <div className="card card-full card-shadow">
           <div className="card-header">Configurator Form</div>
           <div className="card-body p-0">
             <LocalStorageForm globalConfig={globalConfig} setGlobalConfig={setGlobalConfig} />
@@ -78,11 +60,18 @@ export default function GlobalConfigurator() {
 }
 
 function JSONPreview({ globalConfig, focussed }) {
+
+    /*
+  useEffect(() => {
+    const element = document.getElementById("preview-" + focussed)
+    element?.scrollIntoView()
+  , [focussed]})
+    */
   return (
     <Fragment>
         <div>{"{"}</div>
       {Object.entries(globalConfig).map(([id, bbConfig]) => (
-        <pre key={id} className={id === focussed ? "text-primary" :""}>
+        <pre key={id} id={"preview-" + id} className={id === focussed ? "text-primary" :""}>
           {id}: {stringify(bbConfig)},
         </pre>
       ))}
@@ -94,6 +83,7 @@ function JSONPreview({ globalConfig, focussed }) {
 function BuildingBlockAccordion({ globalConfig, setGlobalConfig, focussed, setFocussed }) {
   const setBBConfig = useCallback(
     (newConf) => {
+      console.log("BB Accordion setting config", newConf);
       setGlobalConfig((prev) => ({ ...prev, [newConf.id]: { ...prev[newConf.id], ...newConf } }));
     },
     [setGlobalConfig]
@@ -103,7 +93,7 @@ function BuildingBlockAccordion({ globalConfig, setGlobalConfig, focussed, setFo
     (id) => {
       const newConf = { ...globalConfig };
       delete newConf[id];
-      console.log("removing", id, newConf);
+      console.log("BB accordion removing BB", id, newConf);
       setGlobalConfig(newConf);
     },
     [setGlobalConfig, globalConfig]
@@ -111,6 +101,7 @@ function BuildingBlockAccordion({ globalConfig, setGlobalConfig, focussed, setFo
 
   const newBB = useCallback(() => {
     const bbID = uuid();
+    console.log("BB accordion adding BB", bbID)
     setGlobalConfig((prev) => ({ ...prev, [bbID]: { id: bbID } }));
     setFocussed(bbID)
   }, [setGlobalConfig, setFocussed]);
@@ -145,10 +136,10 @@ function BuildingBlockAccordion({ globalConfig, setGlobalConfig, focussed, setFo
 function BuildingBlockAccordionElement({ bbConfig, setBBConfig, removeBBConfig, bbID, setFocussed, focussed }) {
   console.log("render AccordionElement", bbConfig, setBBConfig, bbID);
   const [bbType, setBBType] = useState(
-    bbConfig?.bbType in allBuildingBlocks ? bbConfig.bbType : null
+    bbConfig?.bbType in ALL_BUILDING_BLOCKS ? bbConfig.bbType : null
   );
 
-  const bbOptions = bbType && allBuildingBlocks[bbType].optionsClass.optionsList;
+  const bbOptions = bbType && ALL_BUILDING_BLOCKS[bbType].optionsClass.optionsList;
 
   const toggleFocussed = useCallback(() => {
     if (focussed === bbID) {
@@ -199,7 +190,7 @@ function BuildingBlockAccordionElement({ bbConfig, setBBConfig, removeBBConfig, 
 function SetBBTypeForm({ setBBType }) {
   return (
     <Formik
-      initialValues={{ bbType: Object.keys(allBuildingBlocks)[0] }}
+      initialValues={{ bbType: Object.keys(ALL_BUILDING_BLOCKS)[0] }}
       onSubmit={(values) => {
         setBBType(values.bbType);
         console.log(values);
@@ -209,7 +200,7 @@ function SetBBTypeForm({ setBBType }) {
         <div className="form-group mb-2 w-100 pe-3 mr-auto">
           <FormLabel htmlFor="bbType">Building Block Type</FormLabel>
           <Field id="bbType" name="bbType" as="select" className="form-select">
-            {Object.keys(allBuildingBlocks).map((key) => (
+            {Object.keys(ALL_BUILDING_BLOCKS).map((key) => (
               <option key={key} value={key}>
                 {key}
               </option>

@@ -32,8 +32,8 @@ class DemoIndicatorConsumer(AsyncJsonWebsocketConsumer):
             content = json.dumps(
                 {
                     "message": event["message"],
-                    "value": random.randint(0, 100) + 100*x,
-                    "tag": ["abc", "xyz","ghi"][x],
+                    "value": random.randint(0, 100) + 100 * x,
+                    "tag": ["abc", "xyz", "ghi"][x],
                 }
             )
 
@@ -43,8 +43,8 @@ class DemoIndicatorConsumer(AsyncJsonWebsocketConsumer):
 
     async def disconnect(self, code):
         pass
-    
-    
+
+
 class GlobalConsumer(AsyncJsonWebsocketConsumer):
 
     room_group_name = "global_websocket"
@@ -61,35 +61,73 @@ class GlobalConsumer(AsyncJsonWebsocketConsumer):
             },
         )
 
-    async def random_info(self, event):
-        n=0
-        while True:
-            x = random.randint(0, 2)
-            content = json.dumps(
-                {
-                    "message": event["message"],
-                    "value": random.randint(0, 100) + 100*x,
-                    "tag": ["100",  "channel1", "channel2"][x],
-                }
-            )
+    async def sendDataPoint(self, event):
+        x = random.randint(0, 2)
+        content = json.dumps(
+            {
+                "message": event["message"],
+                "value": random.randint(0, 100) + 100 * x,
+                "tag": ["100", "channel1", "channel2"][x],
+            }
+        )
+        await self.send(text_data=content)
 
-            await self.send(text_data=content)
+    async def sendArray(self, event):
+        array_content = json.dumps(
+            {
+                "message": event["message"],
+                "value": [random.randint(0, 100) for i in range(7)],
+                "tag": "random_array",
+            }
+        )
+        await self.send(text_data=array_content)
+
+    async def sendBoolean(self, event):
+        content = json.dumps(
+            {
+                "message": event["message"],
+                "value": random.choice([True, False]),
+                "tag": "boolean",
+            }
+        )
+        await self.send(text_data=content)
+        
+    async def sendProgressBarArray(self, event):
+        
+        value = [{"id": "Tank " + str(i+1), "value": random.randint(0, 100)} for i in range(8)]
+        
+        
+        content = json.dumps(
+            {
+                "message": event["message"],
+                "value": value,
+                "tag": "progress_bar",
+            }
+        )
+        await self.send(text_data=content)
+        
+
+    async def random_info(self, event):
+        
+        n = 0
+        await self.sendBoolean(event)
+
+        while True:
+            n += 1
+            if n % 2==0:
+                await self.sendDataPoint(event)
+            if n% 5 == 0:
+                await self.sendProgressBarArray(event)
+            if n % 8 == 0:
+                await self.sendArray(event)
+            if n % random.randint(20, 30) ==0:
+                await self.sendBoolean(event)
             
-            if n==5:
-                array_content = json.dumps(
-                    {
-                        "message": event["message"],
-                        "value": [random.randint(0, 100) for i in range(7)],
-                        "tag": "random_array"
-                    }
-                )
-                await self.send(text_data=array_content)
-                n = 0
-                
-            n+=1
-                
-            
+
             await asyncio.sleep(1)
+            
+            
+
 
     async def disconnect(self, code):
         pass

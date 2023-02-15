@@ -21,7 +21,7 @@ export default class ErrorBoundary extends React.Component {
       : "";
 
     this.setState({ errorStack: stack });
-    console.log("Error Boundary Caught", error, errorInfo);
+    console.log("Error Boundary Caught", error, stringify(errorInfo));
   }
 
   render() {
@@ -30,7 +30,13 @@ export default class ErrorBoundary extends React.Component {
         <Fragment>
           <p>
             <span>Error Caught</span>
-            <span className="text-primary text-underline my-1 px-3" role="button" onClick={() => this.setState({hasError:false})}>Try Again</span>
+            <span
+              className="text-primary text-underline my-1 px-3"
+              role="button"
+              onClick={() => this.setState({ hasError: false })}
+            >
+              Try Again
+            </span>
           </p>
           <pre>{stringify(this.state.error)}</pre>
           <p>Error Stack:</p>

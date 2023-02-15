@@ -13,6 +13,7 @@ function getInitialVals(items) {
 }
 
 export default function Checklist({ checklist, baseurl }) {
+
   const [showCompleted, setShowCompleted] = useState(true);
   const [showDeleted, setShowDeleted] = useState(false);
   const [currentChecklist, setCurrentChecklist] = useState(() => getInitialVals(checklist.items));
@@ -30,7 +31,7 @@ export default function Checklist({ checklist, baseurl }) {
   );
 
   const updateList = useCallback(() => {
-    console.log("Axios base url", baseurl)
+
     axios.put(baseurl, Object.values(currentChecklist))
       .then(function (response) {
         console.log(response);
@@ -167,7 +168,7 @@ function ChecklistItem({ id, text, complete, deleted, setCurrentChecklist }) {
         >
           {complete ? <Icon.CheckSquareFill /> : <Icon.Square />}
         </span>
-        <span className={"me-auto " + (deleted && " text-decoration-line-through")}> {text}</span>
+        <span className={"me-auto " + (deleted ? " text-decoration-line-through": undefined)}> {text}</span>
 
         <div
           role="button"
@@ -184,12 +185,12 @@ function ChecklistItem({ id, text, complete, deleted, setCurrentChecklist }) {
 }
 
 Checklist.options = [
-  { label: "checklist", verbose: "Checklist Data", initial: [], type: "array", dataSource: true },
+  { name: "checklist", verbose: "Checklist Data", fieldType: "dataSource", required:true },
   {
-    label: "baseurl",
+    name: "baseurl",
     verbose: "Base URL",
     initial: "http://localhost:8000/checklist/dev_todo/",
-    type: "text",
+    fieldType: "input",
   },
 ];
 

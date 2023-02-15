@@ -14,8 +14,8 @@ export default function useElementSize(elementRef) {
         // Set window width/height to state
         
         setElementSize({
-          width: elementRef.current.clientWidth,
-          height: elementRef.current.clientHeight
+          width: elementRef.current?.clientWidth,
+          height: elementRef.current?.clientHeight
         });
       }
       // Add event listener

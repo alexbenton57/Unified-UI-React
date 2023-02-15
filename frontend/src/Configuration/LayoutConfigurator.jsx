@@ -6,16 +6,19 @@ import * as Icon from "react-bootstrap-icons";
 import { useEffect } from "react";
 import useElementSize from "Hooks/useElementSize";
 
-function getInitialLayout(config) {
+export function getInitialLayout(config) {
   const defaultLayout = {};
-  return Object.values(config).map((bbConfig) =>
-    bbConfig.gridLayout
-      ? { ...bbConfig.gridLayout, i: bbConfig.id }
-      : { i: bbConfig.id, x: 0, y: 0, w: 2, h: 2 }
-  );
+  if (config) {
+    console.log("getting layout", config);
+    return Object.values(config).map((bbConfig) => {
+      const gridLayout = bbConfig.gridLayout
+        ? { ...bbConfig.gridLayout, i: bbConfig.id }
+        : { i: bbConfig.id, x: 0, y: 0, w: 2, h: 2 };
+      console.log("gridLayout", gridLayout);
+      return gridLayout;
+    });
+  }
 }
-
-
 
 export default function LayoutConfigurator({
   globalConfig,
@@ -26,28 +29,35 @@ export default function LayoutConfigurator({
   const [layout, setLayout] = useState(getInitialLayout(globalConfig));
 
   useEffect(() => {
+
+    console.log("setting save layout with effect", globalConfig)
     setLayout(getInitialLayout(globalConfig));
   }, [globalConfig, setLayout]);
 
   const layoutContainerRef = useRef(null);
 
   const [rows, setRows] = useState(8);
-  const {width, height} = useElementSize(layoutContainerRef)
+  const { width, height } = useElementSize(layoutContainerRef);
 
-
-
-  const saveLayout = useCallback((layout) => {
-    setGlobalConfig((prev) => {
-      var newConf = {};
-      layout.map((BB) => {
-        const bbLayoutObj = (({ x, y, w, h }) => ({ x, y, w, h }))(BB);
-
-        newConf[BB.i] = { ...prev[BB.i], gridLayout: { ...bbLayoutObj } };
+  const saveLayout = useCallback(
+    (newLayout) => {
+      if (layout.length !== 0) {
+      console.log("save layout", newLayout, layout)
+      setGlobalConfig((prev) => {
+        var newConf = {};
+        newLayout.map((BB) => {
+          // copy x, y, w, h from a BB layout object (omit id)
+          const bbLayoutObj = (({ x, y, w, h }) => ({ x, y, w, h }))(BB);
+          // change only the gridlayout property of the global BB config
+          newConf[BB.i] = { ...prev[BB.i], gridLayout: { ...bbLayoutObj } };
+        });
+        return newConf;
       });
-      return newConf;
-    });
-  });
+    }},
+    [setGlobalConfig, layout]
+  );
 
+  // Ideally would only toggleFocussed() if grid item is clicked and not dragged/resized
   const toggleFocussed = useCallback(
     (bbID) => {
       if (focussed === bbID) {
@@ -86,7 +96,7 @@ export default function LayoutConfigurator({
             rowHeight={(height - (rows + 1) * 10) / rows}
             maxRows={rows}
             isBounded={true}
-            onLayoutChange={(layout) => saveLayout(layout)}
+            onLayoutChange={(newLayout) => saveLayout(newLayout)}
           >
             {Object.values(globalConfig).map((bbConfig) => (
               <div
