@@ -1,8 +1,15 @@
 import BuildingBlockOptions from "Classes/BuildingBlockOptions";
 import React, { Fragment, useEffect, useState } from "react";
 
-// 10 minutes to make Log BB
-// 10 minutes to set up Django model
+function tryDate(date) {
+  try {
+    const d = new Date(date)
+    return d.toLocaleString()
+  } catch (error) {
+    return date
+  }
+}
+
 
 export default function Log({ logData }) {
   return (

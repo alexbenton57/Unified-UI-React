@@ -43,7 +43,7 @@ export default function LocalStorageForm({ globalConfig, setGlobalConfig }) {
     return (
       <Fragment>
         <div className="col-12">
-          <div className="row p-3 g-3">
+          <div className="row px-3 m-0 mb-3 g-3">
             <div className="col-md-6">
               <div className="input-group">
                 <div className="input-group-text">Name</div>

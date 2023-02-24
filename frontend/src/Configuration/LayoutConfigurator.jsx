@@ -101,12 +101,13 @@ export default function LayoutConfigurator({
             {Object.values(globalConfig).map((bbConfig) => (
               <div
                 key={bbConfig.id}
-                className={`border rounded overflow-hidden p-2 ${
-                  bbConfig.id === focussed ? "bg-light card-shadow" : ""
+                className={`border rounded d-flex flex-column align-items-center justify-content-center overflow-hidden card-shadow p-2 ${
+                  bbConfig.id === focussed ? "bg-secondary text-white" : "bg-light"
                 }`}
                 onClick={(e) => toggleFocussed(bbConfig.id)}
               >
-                <p>{bbConfig.title}</p>
+                <h5 className="mb-1" >{bbConfig.title}</h5>
+                <p className={bbConfig.id === focussed ? "text-light" : "text-secondary"}>{bbConfig.bbType}</p>
               </div>
             ))}
           </GridLayout>

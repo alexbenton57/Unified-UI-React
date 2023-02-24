@@ -2,9 +2,6 @@ import React, { Fragment, Suspense, useEffect, useState, useMemo, useCallback } 
 import axios from "axios";
 import LoadingSpinner from "Infrastructure/Spinner";
 import useMultiMessenger from "Hooks/useMultiMessenger";
-import useMessenger from "Hooks/useMessenger";
-import useLogOnChange from "Hooks/useLogOnChange";
-//import AutoField, { DATA_SOURCES } from "global-config/AutoField";
 import DataSource from "Classes/DataSource";
 import { DATA_SOURCES } from "CONSTANTS";
 import stringify from "Utils/stringify";
@@ -35,7 +32,7 @@ export default function BuildingBlockPropFetcher({ config, setWrapperErrors }) {
   });
 
   return (
-    <MemoisedBuildingBlock
+    <MemoisedBuildingBlockRenderer
       contentProps={contentProps}
       Content={config.content}
       config={memoisedConfig}
@@ -43,7 +40,7 @@ export default function BuildingBlockPropFetcher({ config, setWrapperErrors }) {
   );
 }
 
-function BuildingBlock({ contentProps, Content, config }) {
+function BuildingBlockRenderer({ contentProps, Content, config }) {
   console.log("render - building block", config.config.title, contentProps);
   const missingProps = getMissingProps(config.options, contentProps);
 
@@ -65,7 +62,7 @@ function BuildingBlock({ contentProps, Content, config }) {
   }
 }
 
-const MemoisedBuildingBlock = React.memo(BuildingBlock);
+const MemoisedBuildingBlockRenderer = React.memo(BuildingBlockRenderer);
 
 function generateProps(options, config, wsData, addError) {
   var newProps = {};

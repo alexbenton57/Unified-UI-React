@@ -39,11 +39,7 @@ export default function AutoField({ option }) {
   if (!option.omittedFromForm && isEnabled(option)) {
     switch (option.fieldType) {
       case "optionArray":
-        return (
-          <FieldArray name={option.name} key={option.name}>
-            {(arrayHelpers) => <OptionSetAccordion option={option} arrayHelpers={arrayHelpers} />}
-          </FieldArray>
-        );
+        return <OptionArrayField {...option} />;
       case "dataSource":
         return <DataSourceField {...option} />;
       case "input":
@@ -65,7 +61,7 @@ export default function AutoField({ option }) {
 
 export function FormLabel({ htmlFor, children }) {
   return (
-    <label className="px-2 mb-1" style={{ fontSize: "0.9em" }} htmlFor={htmlFor}>
+    <label className="px-2 mb-1" style={{ fontSize: "0.875em" }} htmlFor={htmlFor}>
       {children}
     </label>
   );
@@ -93,7 +89,7 @@ function IntegerField(option) {
   // instead of using the name of a field only
   const [field, meta, helpers] = useField(option.name);
   const [value, setValue] = [field.value, helpers.setValue];
-  console.log("Integer Field", value)
+  console.log("Integer Field", value);
 
   return (
     <div className="col-12" id={option.name}>
@@ -106,10 +102,18 @@ function IntegerField(option) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
         />
-        <span className="input-group-text" role="button" onClick={() => setValue(parseFloat(value) + 1)}>
+        <span
+          className="input-group-text"
+          role="button"
+          onClick={() => setValue(parseFloat(value) + 1)}
+        >
           <Icon.PlusLg />
         </span>
-        <span className="input-group-text" role="button" onClick={() => setValue(parseFloat(value) -1 )}>
+        <span
+          className="input-group-text"
+          role="button"
+          onClick={() => setValue(parseFloat(value) - 1)}
+        >
           <Icon.DashLg />
         </span>
       </div>
@@ -236,15 +240,17 @@ function JSONField(option) {
   const checkIsValid = useCallback((val) => {
     try {
       const jsonVal = JSON.parse(val);
-      return true
+      return true;
     } catch (error) {
       return false;
     }
-  })
+  });
 
   useEffect(() => {
-    if (checkIsValid(currentVal)) {setValue(JSON.parse(currentVal))}
-  }, [currentVal])
+    if (checkIsValid(currentVal)) {
+      setValue(JSON.parse(currentVal));
+    }
+  }, [currentVal]);
 
   return (
     <div className="col-12">
@@ -346,8 +352,17 @@ function BooleanField(option) {
   );
 }
 
+function OptionArrayField(option) {
+  return (
+    <FieldArray name={option.name} key={option.name}>
+      {(arrayHelpers) => <OptionSetAccordion option={option} arrayHelpers={arrayHelpers} />}
+    </FieldArray>
+  );
+}
+
 function OptionSetAccordion({ option, arrayHelpers }) {
   const id = uuid();
+  const { push, remove, pop } = arrayHelpers;
 
   const nameArray = option.name.split(".");
   const innerOptionValues =
@@ -360,8 +375,8 @@ function OptionSetAccordion({ option, arrayHelpers }) {
       <div className="col-12">
         <FormLabel htmlFor={id}>{option.verbose}</FormLabel>
         <Accordion bsPrefix="accordion accordion-flush border rounded px-0 card-shadow">
-          {innerOptionValues.map((_, i) => (
-            <OptionSetAccordionItem option={option} i={i} />
+          {innerOptionValues.map((values, i) => (
+            <OptionSetAccordionItem key={i} {...{ option, values, i, push, remove }} />
           ))}
 
           <div
@@ -375,7 +390,7 @@ function OptionSetAccordion({ option, arrayHelpers }) {
               <span
                 className="text-primary py-1 px-3"
                 role="button"
-                onClick={() => arrayHelpers.push(blankValues)}
+                onClick={() => push(blankValues)}
               >
                 Add Option Set
               </span>
@@ -387,12 +402,18 @@ function OptionSetAccordion({ option, arrayHelpers }) {
   );
 }
 
-function OptionSetAccordionItem({ option, i }) {
+function OptionSetAccordionItem({ option, i, values, insert, remove }) {
   if (option.options.length > 1) {
     return (
       <Accordion.Item eventKey={i} bsPrefix={"accordion-item rounded-top"}>
-        <Accordion.Button bsPrefix={"accordion-button py-1 rounded-top"}>
-          {option.verbose + " " + String(i + 1)}
+        <Accordion.Button bsPrefix={"accordion-button py-1 fs-6 rounded-top"}>
+          <span onClick={() => remove(i)}className="me-3 text-danger" role="button" >
+            <Icon.XLg className="align-self-center" />
+          </span>
+          <span  onClick={() => push(values)}className="me-3 " role="button">
+            <Icon.Clipboard className="align-self-center" />
+          </span>
+          <span className="fst-italic">{option.verbose + " " + String(i + 1)}</span>
         </Accordion.Button>
 
         <Accordion.Body>

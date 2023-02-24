@@ -4,35 +4,37 @@ import AutoField from "Configuration/AutoField";
 import { WEBSOCKET_CHANNELS, DATA_SOURCES } from "CONSTANTS";
 import getInitialValues from "Utils/getInitialValues";
 
-
 export default function BuildingBlockForm({ bbID, bbType, options, setBBConfig, existingConfig }) {
   const initialValues = getInitialValues(options, existingConfig);
   initialValues.id = bbID;
   initialValues.bbType = bbType;
 
-
   console.log("Building Block Options", initialValues.title, options, initialValues);
 
   return (
     <Formik initialValues={initialValues} onSubmit={(values) => setBBConfig(values)}>
-      {({ values, errors, touched, handleReset }) => (
-        <BuildingBlockFormInner {...{ options, values, setBBConfig }} />
-      )}
+      <Form className="row gy-2">
+        {options.map((option) => (
+          <AutoField key={option.name} option={option} />
+        ))}
+        <div className="col-12">
+          <button type="submit" className="btn btn-primary my-3">
+            Submit
+          </button>
+        </div>
+      </Form>
     </Formik>
   );
 }
 
-
-const defaultDataSourceLinks = {
-  [DATA_SOURCES.CONSTANT]: "",
-  [DATA_SOURCES.HTTP]: "http://",
-  [DATA_SOURCES.WS]: WEBSOCKET_CHANNELS[0],
-};
-
-
-
 function BuildingBlockFormInner({ options, values, setBBConfig, bbConfig }) {
   console.log("BuildingBlockFormInner({ options, values })", options, values);
+
+  useEffect(() => {
+    if (values !== bbConfig) {
+      setBBConfig(values);
+    }
+  }, [values, bbConfig, setBBConfig]);
 
   return (
     <Form className="row gy-2">

@@ -1,7 +1,5 @@
-import LineChartMultiInput from "BuildingBlocks/LineChartMultiInput";
-import LineChartTwoInput from "BuildingBlocks/LineChartTwoInput";
+
 import Checklist from "BuildingBlocks/Checklist";
-import ProgressBar from "BuildingBlocks/ProgressBar";
 import Chart from "BuildingBlocks/Chart";
 import Gauge from "BuildingBlocks/Gauge";
 import Log from "BuildingBlocks/Log";
@@ -22,10 +20,8 @@ const ALL_BUILDING_BLOCKS = {
   "Log": Log,
   "Gauge": Gauge,
   "Composed Chart": Chart,
-  "Progress Bar": ProgressBar,
   "Checklist": Checklist,
-  "Line Chart (2 Input)": LineChartTwoInput,
-  "Line Chart (Multi Input)": LineChartMultiInput,
+
 };
 
 export default ALL_BUILDING_BLOCKS;

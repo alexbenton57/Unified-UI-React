@@ -13,18 +13,18 @@ export const useFormContainerContext = () => {
   return formContainer;
 };
 
-export default function PageRenderer() {
+export default function ConfigLoader() {
   const [pageConfig, setPageConfig] = useState();
   const [formData, setFormData] = useState({});
 
   if (!pageConfig) {
-    return <ConfigLoader setPageConfig={setPageConfig} />;
+    return <ConfigLoaderForm setPageConfig={setPageConfig} />;
   } else {
-    return <PageGridLayout pageConfig={pageConfig} />;
+    return <PageRenderer pageConfig={pageConfig} />;
   }
 }
 
-export function PageGridLayout({ pageConfig }) {
+export function PageRenderer({ pageConfig }) {
   console.log("render - Page grid layout");
   const layoutContainerRef = useRef();
   const { width, height } = useElementSize(layoutContainerRef);
@@ -63,7 +63,7 @@ export function PageGridLayout({ pageConfig }) {
     </formContainerContext.Provider>
   );
 }
-function ConfigLoader({ setPageConfig }) {
+function ConfigLoaderForm({ setPageConfig }) {
   const configKeys = getFromLS("all-config-keys");
   const loadFieldRef = useRef();
   const load = useCallback(

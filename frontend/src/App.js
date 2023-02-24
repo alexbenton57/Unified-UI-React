@@ -15,11 +15,11 @@ import "./Styles/Shoestring.css";
 import "/node_modules/react-grid-layout/css/styles.css";
 import "/node_modules/react-resizable/css/styles.css";
 
-import PageRenderer from "RenderStack/PageRenderer";
+import ConfigLoader from "RenderStack/PageRenderer";
 import GlobalConfigurator from "Configuration/GlobalConfigurator";
 
 import DEMO_CONFIGS from "DEMO_CONFIGS";
-import { PageGridLayout } from "RenderStack/PageRenderer";
+import { PageRenderer } from "RenderStack/PageRenderer";
 
 ReactModal.setAppElement(document.getElementById("root"));
 
@@ -41,7 +41,7 @@ function AppContent(props) {
 
   const demoPages = Object.entries(DEMO_CONFIGS).map(([label, config]) => ({
     id: label,
-    page: PageGridLayout,
+    page: PageRenderer,
     pageConfig: config.config,
     Icon: Icon[config.icon],
     title: config.name,
@@ -117,7 +117,7 @@ function Page1() {
 }
 
 function Page8() {
-  return <PageRenderer />;
+  return <ConfigLoader />;
 }
 
 export default App;

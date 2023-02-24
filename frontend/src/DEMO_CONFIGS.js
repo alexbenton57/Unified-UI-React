@@ -163,7 +163,7 @@ const DEMO_CONFIGS = {
         id: "e6db40e4-6548-4951-9bdd-f3426cc0757f",
         gridLayout: { x: 4, y: 0, w: 4, h: 1 },
         title: "Cut Stock",
-        formAs: "primary",
+        formAs: "Form Container",
         buttonText: "Cut Stock",
         containerTarget: "4fa76a1b-1933-49eb-ab47-919092b2ce0d",
         formOptions: [

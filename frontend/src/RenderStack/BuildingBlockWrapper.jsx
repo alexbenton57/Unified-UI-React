@@ -7,6 +7,7 @@ import { ArrowClockwise, InfoCircle } from "react-bootstrap-icons";
 import stringify from "Utils/stringify";
 import ALL_BUILDING_BLOCKS from "BuildingBlocks/ALL_BUILDING_BLOCKS";
 import useMessengerCallback from "Hooks/useMessengerCallback";
+import HoverTooltip from "Infrastructure/HoverTooltip";
 
 // https://www.developerway.com/posts/react-re-renders-guide
 // https://www.developerway.com/posts/how-to-write-performant-react-code
@@ -33,10 +34,6 @@ export default function BuildingBlockWrapper({ config }) {
     newConfigClass();
   });
 
-  // 1 - fetch data sources from config
-  // 2 - pass proper config to Data fetcher
-  // 3-  Have errors in top bar for missing data etc
-
   const children = (
     <Suspense fallback={<LoadingSpinner />}>
       <ErrorBoundary fallback={<p>Error in rendering card contents</p>}>
@@ -47,7 +44,6 @@ export default function BuildingBlockWrapper({ config }) {
       </ErrorBoundary>
     </Suspense>
   );
-  const displayStyle = ALL_BUILDING_BLOCKS[config.bbType].headerless;
 
   switch (ALL_BUILDING_BLOCKS[config.bbType].displayStyle) {
     case "headerless":
@@ -101,10 +97,13 @@ function ErrorDropdown({ errors }) {
         >
           Errors
         </span>
-        <ul className="dropdown-menu dropdown-menu-end" style={{ zIndex: 10000 }}>
+        <ul
+          className="dropdown-menu dropdown-menu-end"
+          style={{ zIndex: 1000000, position: "relative" }}
+        >
           {errors.map((error, i) => (
             <li key={i}>
-              <span className="dropdown-item-text">{JSON.stringify(error)}</span>
+              <span className="dropdown-item-text">{stringify(error)}</span>
             </li>
           ))}
         </ul>
@@ -113,6 +112,11 @@ function ErrorDropdown({ errors }) {
 }
 
 function ConfigDropdown({ config }) {
+  return (
+    <HoverTooltip toShow={<pre>{stringify(config)}</pre>}>
+      <InfoCircle />
+    </HoverTooltip>
+  );
   return (
     <span className="btn-group">
       <span
@@ -123,7 +127,10 @@ function ConfigDropdown({ config }) {
       >
         <InfoCircle />
       </span>
-      <pre className="dropdown-menu dropdown-menu-end" style={{ zIndex: 10000 }}>
+      <pre
+        className="dropdown-menu dropdown-menu-end"
+        style={{ zIndex: 1000000, position: "relative" }}
+      >
         {stringify(config)}
       </pre>
     </span>

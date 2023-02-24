@@ -95,7 +95,6 @@ function CategoryFormModal({ categories, post, modalIsOpen, closeModal }) {
                   <div className="col-6"></div>
                 </div>
 
-                <pre>{stringify(category)}</pre>
               </Tab>
             ))}
           </Tabs>
