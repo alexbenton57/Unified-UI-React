@@ -4,7 +4,7 @@ import * as Icon from "react-bootstrap-icons";
 import useMessenger from "Hooks/useMessenger";
 
 export default function ConnectionSymbol(props) {
-  const status = useMessenger(socketStatuses.UPDATEMESSAGETAG, socketStatuses.INITIALISING);
+  const status = useMessenger(socketStatuses.STATUS_UPDATE_MESSAGE_TAG, socketStatuses.INITIALISING);
 
   function getDisplay(socketStatus) {
     var display = {};

@@ -23,19 +23,23 @@ export default class DataSource {
     }
   }
 
+
+  // this function is a bit of a bodge
+  // need to formalise method for getting from raw HTTP data to ata in correct props format.
   processResult(res) {
 
       try {
         console.log("Processing Result", res)
         return res.results.map((r) => r.value);
       } catch (error) {
-        console.log("Process Result Error", error, res)
+        console.log("HTTP result not an array, returning raw result", error, res)
         return res;
       }
-
-    return res;
   }
 
+
+  // this function wraps the axios get function to prevent a BB's render until HTTP data is present.
+  
   wrapAxiosPromise(url) {
     console.log("Wrapping Axios Promise Datasource")
     const process = this.processResult;
@@ -78,6 +82,7 @@ export default class DataSource {
     return {
       read() {
         if (status === "pending") {
+          // suspend rendering
           throw suspend;
         } else if (status === "error") {
           console.log("HTTP Error", result);

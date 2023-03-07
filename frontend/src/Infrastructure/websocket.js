@@ -2,9 +2,9 @@ import React, { createContext, useContext, useState, useEffect, useRef, Fragment
 import { w3cwebsocket as W3CWebSocket } from "websocket";
 import { v4 as uuid } from "uuid";
 import useMessenger from "Hooks/useMessenger";
+import Messenger from "Classes/Messenger";
 
 const messengerContext = createContext({});
-
 export const useMessengerContext = () => {
   const messenger = useContext(messengerContext);
   return messenger;
@@ -16,33 +16,17 @@ export const socketStatuses = {
   CONNECTED: "Connected",
   DISCONNECTED: "Disconnected",
   RECONNECTING: "Reconnecting",
-  UPDATEMESSAGETAG: "Status Update for Connection Symbol",
+  STATUS_UPDATE_MESSAGE_TAG: "Status Update for Connection Symbol",
 };
+const REQUEST_EVENT_TAG = "REQUEST_VALUE";
 
-class Messenger extends EventTarget {
-  constructor() {
-    super();
-    this.id = Math.round(Math.random() * 100000);
-  }
-
-  emit(tag, data) {
-    const newEvent =
-      data !== undefined ? new CustomEvent(tag, { detail: data }) : new CustomEvent(tag);
-
-    
-    this.dispatchEvent(newEvent);
-  }
-
-  request_value(tag) {
-    const newEvent = new CustomEvent("request_value", {detail: tag})
-    this.dispatchEvent(newEvent)
-  }
-
-}
 
 export function MessengerHandler({ children }) {
-  // get the context value which will set the notification data
 
+  // retain messenger through rerenders
+  // however, this approach means that the body of other components is run before the messenger is intitialised
+  // ... meaning that components need to wait for a valid messenger
+  // could useMemo() be another way to do this?
   const [messenger, setMessenger] = useState(() => getMessenger());
 
   console.log("render - messenger Handler");
@@ -62,23 +46,23 @@ export function MessengerHandler({ children }) {
 }
 
 function SocketHandler({ messenger }) {
-
   const webSocketRef = useRef(null);
   const [status, setStatus] = useState(socketStatuses.INITIALISING);
-  const [latestValues, setLatestValues] = useState({})
+  const [latestValues, setLatestValues] = useState({});
 
+  // send out status updates for the connection symbol
   async function updateStatus(socketStatus) {
     while (!messenger) {
       await new Promise((res) => setTimeout(res, 100));
     }
     setStatus(socketStatus);
     console.log("Websocket Status", socketStatus);
-    messenger.emit(socketStatuses.UPDATEMESSAGETAG, socketStatus);
+    messenger.emit(socketStatuses.STATUS_UPDATE_MESSAGE_TAG, socketStatus);
   }
 
   function initialiseNewSocket() {
     const socket = new W3CWebSocket("ws://127.0.0.1:8000/ws/global");
-    socket.id = Math.round(Math.random() * 10000000000);
+    socket.id = uuid()
     console.log("Global Websocket Object Initialised", socket.id);
 
     socket.onopen = () => {
@@ -95,11 +79,11 @@ function SocketHandler({ messenger }) {
       if (typeof message !== "undefined" && message !== null) {
         const data = JSON.parse(message.data);
         messenger.emit(data.tag, data.value);
-        setLatestValues(lv => ({...lv, [data.tag]: [data.value]}))
+        setLatestValues((lv) => ({ ...lv, [data.tag]: [data.value] }));
       }
     };
-    
-    window.addEventListener("onbeforeunload", () => socket.close("Window Closed"))
+
+    window.addEventListener("onbeforeunload", () => socket.close("Window Closed"));
     return socket;
   }
 
@@ -108,6 +92,7 @@ function SocketHandler({ messenger }) {
     updateStatus(socketStatuses.RECONNECTING);
   }
 
+  // this is the effect that actually runs websocket connection logic
   useEffect(() => {
     switch (status) {
       case socketStatuses.INITIALISING:
@@ -122,10 +107,19 @@ function SocketHandler({ messenger }) {
       case socketStatuses.DISCONNECTED:
         waitAndReconnect(5);
         break;
-      initial:
-        break;
+      default: break;
     }
   }, [status]);
+
+  const [updateListener, setUpdateListener] = useState(null);
+
+  /*
+   adds update listener to the messenger 
+   i.e. when a ws dataSource is initiated, it will request the most recent value, 
+   and this listener will provide it.
+
+   This stops the datasource fromhaving to wait for new data to arrive
+  */
 
   useEffect(() => {
     async function addUpdateListener() {
@@ -133,23 +127,33 @@ function SocketHandler({ messenger }) {
         await new Promise((res) => setTimeout(res, 100));
       }
 
-      
-      messenger.addEventListener("request_value", msg => {
-        if (latestValues[msg.detail]) {
+      if (updateListener) {
+        messenger.removeEventListener(REQUEST_EVENT_TAG, updateListener);
+      }
+
+      const newListener = (msg) => {
+        if (latestValues[msg?.detail]) {
           messenger.emit(msg.detail, latestValues[msg.detail]);
-          console.log("Request Value Emitted", msg.detail, latestValues[msg.detail])
+          console.log("Request Value Emitted", msg.detail, latestValues[msg.detail]);
         }
-        
-      })
+      };
+
+      setUpdateListener(newListener);
+      messenger.addEventListener(REQUEST_EVENT_TAG, newListener);
     }
 
-    addUpdateListener()
-  }, [messenger])
+    addUpdateListener();
+
+    return () => {
+      messenger.removeEventListener(REQUEST_EVENT_TAG, updateListener);
+    };
+  }, [messenger, latestValues]);
 
   return null;
-  
 }
 
+// a component to log the last 5 messages on channel '100'
+// (a debugging component)
 export function SocketLogger() {
   const [logs, setLogs] = useState([]);
   const lastLog = useMessenger("100");

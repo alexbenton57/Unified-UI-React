@@ -19,9 +19,12 @@ function getListener(tag, target, setValue) {
 }
 
 
+ // This custom hook allows a component to listen to the global Messenger object
+ // it returns a stateful value containing the latest value received for a particular message tag
+ // Ideally there would be some way to listen to all messages (ie without passing subscribedTag)
 
 export default function useMessenger(subscribedTag, defaultState = null) {
-  // Also want some way to listen to all messages (ie without passing subscribedTag)
+ 
   console.log("useMessenger() Called");
   const [value, setValue] = useState(defaultState);
   const messengerObject = useMessengerContext();
@@ -31,6 +34,8 @@ export default function useMessenger(subscribedTag, defaultState = null) {
     console.log("useMessenger() effect activated");
 
     async function doSocket() {
+
+      // wait for messenger. This shouldn't strictly be necessary though
       while (!messengerObject) {
         await new Promise((res) => setTimeout(res, 100));
       }

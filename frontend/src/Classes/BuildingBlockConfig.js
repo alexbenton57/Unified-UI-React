@@ -10,7 +10,8 @@ export default class BuildingBlockConfig {
     this.options = this.content.optionsClass;
     this.config = generateConfigWithDataSources(config, this.options);
     this.wsConfig = generateWebsocketConfig(this.config, this.options);
-    // check form values against options
+    
+    // also want to run a function to validate the input config against the options
   }
 }
 
@@ -24,6 +25,8 @@ export function checkNameInConfig(name, config) {
       }
 }
 
+// recursively loop through options object 
+// returns {dataSourceUUID: {tag: "channel1", value: "someValue"}, ...}
 function generateWebsocketConfig(config, options) {
   var wsConfig = {};
 
@@ -37,9 +40,6 @@ function generateWebsocketConfig(config, options) {
 
   return wsConfig;
 }
-
-// get {...{label: {tag: wsTag, value: defaultValue}}}
-// label: DataSource.dataSourceID
 
 function getWsConfigValue(option, configValue) {
   switch (option.fieldType) {
@@ -70,6 +70,8 @@ function getWsConfigValue(option, configValue) {
   }
 }
 
+// loop through config object, convert all form values which represent data sources
+// ... into formal DataSource class instances
 function generateConfigWithDataSources(config, options) {
   const newConfig = {};
 
@@ -98,16 +100,3 @@ function getConfigValue(option, configValue) {
       return configValue;
   }
 }
-
-const a = [
-  {
-    "name": "location",
-    "verbose": "Location",
-    "fieldType": "choice",
-    "displayedAs": "pills",
-    "choices": ["Store 1", "Store 2"]
-  },
-  {"name": "barcode", "verbose": "Barcode", "fieldType": "Input"},
-  {"name": "qty", "verbose": "Number of Cuts", "fieldType": "integer"},
-  {"name": "length", "verbose": "Cut length in m", "fieldType": "integer"}
-]

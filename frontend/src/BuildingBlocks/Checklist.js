@@ -189,7 +189,7 @@ Checklist.options = [
   {
     name: "baseurl",
     verbose: "Base URL",
-    initial: "http://localhost:8000/checklist/dev_todo/",
+    defaultValue: "http://localhost:8000/checklist/dev_todo/",
     fieldType: "input",
   },
 ];

@@ -45,6 +45,8 @@ export default function BuildingBlockWrapper({ config }) {
     </Suspense>
   );
 
+  // return building block based on display style 
+  // (this could be added as a regular building block option in the same way as 'title')
   switch (ALL_BUILDING_BLOCKS[config.bbType].displayStyle) {
     case "headerless":
       return (
@@ -85,6 +87,7 @@ export default function BuildingBlockWrapper({ config }) {
   }
 }
 
+// displays data fetching errors
 function ErrorDropdown({ errors }) {
   if (errors.length > 0)
     return (
@@ -117,78 +120,4 @@ function ConfigDropdown({ config }) {
       <InfoCircle />
     </HoverTooltip>
   );
-  return (
-    <span className="btn-group">
-      <span
-        className="dropdown-toggle d-flex align-items-center"
-        role="button"
-        data-bs-toggle="dropdown"
-        aria-expanded="false"
-      >
-        <InfoCircle />
-      </span>
-      <pre
-        className="dropdown-menu dropdown-menu-end"
-        style={{ zIndex: 1000000, position: "relative" }}
-      >
-        {stringify(config)}
-      </pre>
-    </span>
-  );
 }
-
-const MemoizedErrorDropdown = React.memo(ErrorDropdown);
-
-/*
-function BuildingBlockWrapperOld({ content, config }) {
-  const [currentConfig, setCurrentConfig] = useState(config);
-  console.log("Render - BB Wrapper Multi", config);
-
-  useEffect(() => {
-    setCurrentConfig(config)
-  }, [setCurrentConfig, config])
-
-  const refresh = useCallback(() => {
-
-    setCurrentConfig((prev) => {
-      let newConf = [...prev];
-      newConf.forEach((option) => {
-        if (option.multiple) {
-          option.formValues.forEach((valueObj) => {
-
-            Object.entries(valueObj).forEach(([_, value]) => {
-              try {
-                value.refresh();
-              } catch (err) {}
-            });
-          });
-        } else {
-          try {
-            option.source.refresh();
-          } catch (err) {}
-        }
-      });
-
-      return newConf
-    });
-  }, [setCurrentConfig]);
-
-
-
-
-
-  return (
-
-    <Fragment>
-      <p role="button" className="text-primary" onClick={() => refresh()}>
-        Refresh Data
-      </p>
-        <Suspense fallback={<LoadingSpinner />}>
-        <DataFetcher Content={content} config={currentConfig} />
-      </Suspense>    
-    </Fragment> 
-
-
-  );
-}
-*/

@@ -7,16 +7,17 @@ import { DATA_SOURCES } from "CONSTANTS";
 import stringify from "Utils/stringify";
 import BuildingBlockConfig, { checkNameInConfig } from "Classes/BuildingBlockConfig";
 
-// config is of type BuildingBlockConfig
+// config is now a BuildingBlockConfig instance
 export default function BuildingBlockPropFetcher({ config, setWrapperErrors }) {
+ 
   const [errors, setErrors] = useState([]);
 
-  console.log("render - BuildingBlockPropFetcher", config.config.title, errors);
-
-  const memoisedConfig = useMemo(() => config, [config]);
-  const wsData = useMultiMessenger(memoisedConfig.wsConfig);
 
   // memoise to prevent re-rendering of BB while errors are updated
+  const memoisedConfig = useMemo(() => config, [config]);
+  // create wsData
+  const wsData = useMultiMessenger(memoisedConfig.wsConfig);
+  // get content props and add errors as required
   const contentProps = useMemo(() => {
     if (errors.length !== 0) {
       setErrors((_) => []);
@@ -30,6 +31,7 @@ export default function BuildingBlockPropFetcher({ config, setWrapperErrors }) {
     console.log("render - setting wrapper errors");
     setWrapperErrors(errors), [errors];
   });
+
 
   return (
     <MemoisedBuildingBlockRenderer
@@ -64,6 +66,7 @@ function BuildingBlockRenderer({ contentProps, Content, config }) {
 
 const MemoisedBuildingBlockRenderer = React.memo(BuildingBlockRenderer);
 
+// recursively loop through BB config, converting formValues to props and resolving data sources
 function generateProps(options, config, wsData, addError) {
   var newProps = {};
 
@@ -89,6 +92,7 @@ function getProp(option, configValue, wsData, addError) {
 
     case "dataSource":
       // get websocket or http value from a datasource
+      // definitely scope to add more error conditions here
       if (configValue instanceof DataSource) {
         const value = sourceToValue(configValue, wsData, addError);
         return { [option.name]: value };
@@ -131,6 +135,7 @@ function sourceToValue(source, wsData, addError) {
   }
 }
 
+// prevent render if required props are not present
 function getMissingProps(options, props) {
   const missingProps = options.map((option) => {
     if (!(option.name in props)) {

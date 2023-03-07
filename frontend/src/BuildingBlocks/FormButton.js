@@ -1,7 +1,7 @@
 import BuildingBlockOptions from "Classes/BuildingBlockOptions";
 import React, { Fragment, useRef } from "react";
 
-import GenericForm from "Infrastructure/GenericForm";
+import GenericForm from "BuildingBlocks/GenericForm";
 import stringify from "Utils/stringify";
 import { useFormContainerContext } from "RenderStack/PageRenderer";
 
@@ -37,6 +37,7 @@ const formOptionsDemo = [
   }
 ];
 
+// opens a form in a form container building block
 export default function FormButton({ formAs, containerTarget, formOptions, buttonText, buttonColor }) {
   const { setFormData } = useFormContainerContext();
   const formData = {

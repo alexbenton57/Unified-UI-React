@@ -13,9 +13,9 @@ export const useFormContainerContext = () => {
   return formContainer;
 };
 
+// load from local storage and view a page config
 export default function ConfigLoader() {
   const [pageConfig, setPageConfig] = useState();
-  const [formData, setFormData] = useState({});
 
   if (!pageConfig) {
     return <ConfigLoaderForm setPageConfig={setPageConfig} />;
@@ -63,6 +63,8 @@ export function PageRenderer({ pageConfig }) {
     </formContainerContext.Provider>
   );
 }
+
+
 function ConfigLoaderForm({ setPageConfig }) {
   const configKeys = getFromLS("all-config-keys");
   const loadFieldRef = useRef();

@@ -9,8 +9,10 @@ import CategoryPostButton from "BuildingBlocks/CategoryPostButton";
 import FormButton from "BuildingBlocks/FormButton";
 import FormContainer from "BuildingBlocks/FormContainer";
 import ProgressBarArray from "./ProgressBarArray";
+import GenericForm from "./GenericForm";
 
 const ALL_BUILDING_BLOCKS = {
+  "Generic Form": GenericForm,
   "Progress Bar Array": ProgressBarArray,
   "Form Button": FormButton,
   "Form Container": FormContainer,

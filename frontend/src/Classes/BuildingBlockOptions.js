@@ -1,7 +1,6 @@
-const reservedNames = ["title", "gridLayout", "id", "bbType"];
-
 export default class BuildingBlockOptions {
   constructor(optionsList) {
+
     var defaultOptions = [
       new Option({ name: "title", verbose: "Panel Title", fieldType: "input", required: true }),
       new Option({ name: "gridLayout", verbose: "Grid Layout", fieldType: "layout", required: true, omittedFromForm: true }),
@@ -67,18 +66,20 @@ const possibleFieldTypes = [
 const possibleFields = [
 
   // implemented
-  "name", //unique identifier for field
-  "fieldType", // choice(["input", "choice", "datasource", "optionArray" ]) + ["radio", "slider", "colour", "threshold"]  
+  "name", //unique identifier for field 
   "verbose", // change to friendly name?
-  "options", // combine into one attribute? - optionSet: [...options]
+  "fieldType", // choice(["input", "choice", "datasource", "optionArray" ]) + ["radio", "slider", "colour", "threshold"]  
+  "defaultValue",   
   "choices", 
-  "omittedFromForm", // maybe a formOptions: {...options} property would be better
-  "defaultValue", 
+  "options",
+
+
   "required", // required to have a value in form - or required that data is present before loading
+
+  "omittedFromForm", // maybe a formOptions: {...options} property would be better
   "enabledBy", // show when expression evaluates to true i.e. <name> if bool or <name == "choice"> if choice field
                   // searches for nearest parent
-  "initial", // change to default value - placeholder should be something different
-  
+
   "displayedAs", // {choice : ['pills', 'dropdown'], boolean: ["radio", "..."]},
 
 
@@ -87,22 +88,9 @@ const possibleFields = [
   "formOptions", // {omittedFromForm: <bool>, formGroup: "group verbose name"}
   "dataType", // unsure on how to implement this one - or if we need it - meant to be a data validation property for the form
   
-  
-  // not required  
-  //get rid/ replace
-  //"formValues", // don't really want these - they should come from a separate config object
-  //"value",
-  //"source", // from data source - {type: "ws", link: "channel" promise: promiseObj}
-  //"dataSource", // bool
-  //"multiple", // bool
-  //"type", // not currently implemented properly - 
-  //could be simple(default), choice, dataSource, multiple etc. Use this for AutoField switch case?
-  //"label", // change to name?
-
-
-
 ];
 
+const reservedNames = ["title", "gridLayout", "id", "bbType"];
 const requiredFields = ["name", "fieldType"];
 
 class Option {
@@ -130,5 +118,6 @@ class Option {
 
     
     // Make sure required fields are there
+    // Make sure option name is not reserved (might need to do this in the Options class)
   }
 }

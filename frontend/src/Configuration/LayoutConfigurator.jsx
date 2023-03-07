@@ -29,7 +29,6 @@ export default function LayoutConfigurator({
   const [layout, setLayout] = useState(getInitialLayout(globalConfig));
 
   useEffect(() => {
-
     console.log("setting save layout with effect", globalConfig)
     setLayout(getInitialLayout(globalConfig));
   }, [globalConfig, setLayout]);
@@ -39,9 +38,15 @@ export default function LayoutConfigurator({
   const [rows, setRows] = useState(8);
   const { width, height } = useElementSize(layoutContainerRef);
 
+
+  // there is a bug here that saveLayout is called unnecessarily
+  // this causes the layout to reset to 1x1 tiles when a new config is loaded
+  // all component renders and rerenders on loading a page config should be traced in detail to find the cause
   const saveLayout = useCallback(
     (newLayout) => {
+      // a bodge to prevent some layout resets
       if (layout.length !== 0) {
+        
       console.log("save layout", newLayout, layout)
       setGlobalConfig((prev) => {
         var newConf = {};

@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 
+// a debug hook, useful for debuggin rerenders
 export default function useLogOnChange(variable, name) {
 
     const [callNo, setCallNo] = useState(0)

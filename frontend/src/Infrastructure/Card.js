@@ -1,5 +1,7 @@
 import React from "react";
 import ErrorBoundary from "Infrastructure/ErrorBoundary";
+
+// now replace with react-grid-layout
 export default function Card({ width, height, title, children, header, body, footer }) {
   let widthDict = {
     xss: "col-2",

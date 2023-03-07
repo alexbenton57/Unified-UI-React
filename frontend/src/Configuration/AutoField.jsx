@@ -135,7 +135,7 @@ function DataSourceField(option) {
     setValue(currentValue, false);
   };
 
-  // setValue when lastValues is changed
+  // setValue when lastValues is changed. Remembers the value set for each data source type
   useEffect(() => setFormValue(value.type), [lastValues]);
 
   return (
@@ -353,6 +353,8 @@ function BooleanField(option) {
 }
 
 function OptionArrayField(option) {
+  // arrayHelpers is an object from Formik containing methods that allow for
+  // ... manipulation of lists of form values
   return (
     <FieldArray name={option.name} key={option.name}>
       {(arrayHelpers) => <OptionSetAccordion option={option} arrayHelpers={arrayHelpers} />}
@@ -364,9 +366,12 @@ function OptionSetAccordion({ option, arrayHelpers }) {
   const id = uuid();
   const { push, remove, pop } = arrayHelpers;
 
+  // for nested optionsets. Name will be of format:
+  // outerName.[i].innerName1.[j].(innerName2.[k])
   const nameArray = option.name.split(".");
   const innerOptionValues =
     nameArray.reduce((prev, namePart) => prev[namePart], arrayHelpers.form.values) || [];
+
   const blankValues = getInitialValues(option.options);
 
   console.log("AccordionField", option, arrayHelpers, blankValues, innerOptionValues);

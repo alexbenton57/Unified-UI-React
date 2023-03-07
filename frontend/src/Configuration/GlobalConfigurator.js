@@ -10,6 +10,7 @@ import BuildingBlockAccordion from "./BuildingBlockAccordion";
 
 
 export default function GlobalConfigurator() {
+  // Top level component for page config configuration
   const [globalConfig, setGlobalConfig] = useState({});
   const [focussed, setFocussed] = useState("");
 

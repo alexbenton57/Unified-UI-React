@@ -25,6 +25,7 @@ placement:
 */
 
 export default function HoverTooltip({ children, toShow, placement }) {
+  // bug - this should render on top of everything else but currently doesnt
   const renderTooltip = (props) => (
 
     <div className="bg-light text-dark fs-6 p-3 text-start border rounded" id="button-tooltip" {...props}>

@@ -24,7 +24,6 @@ import { PageRenderer } from "RenderStack/PageRenderer";
 ReactModal.setAppElement(document.getElementById("root"));
 
 function App() {
-  //return (<AppContent />);
   return (
     <MessengerHandler>
       <AppContent />
@@ -34,7 +33,7 @@ function App() {
 
 function AppContent(props) {
   const configPages = [
-    { id: "page1", page: Page1 , Icon: Icon.ChatRight, title: "MultiChart" },
+    { id: "page1", page: Page1, Icon: Icon.ChatRight, title: "MultiChart" },
     { id: "page7", page: Page7, Icon: Icon.Globe, title: "Global Configuration" },
     { id: "page8", page: Page8, Icon: Icon.ColumnsGap, title: "Render Page" },
   ];

@@ -40,6 +40,7 @@ const DEMO_CONFIGS = {
             categoryName: "Machine Fault",
             otherEnabled: true,
             categoryEntries: [
+              
               { categoryEntry: "Power Off" },
               { categoryEntry: "Broken Tooling" },
               { categoryEntry: "Machine Failure" },

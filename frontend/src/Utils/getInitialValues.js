@@ -7,7 +7,8 @@ const defaultDataSourceLinks = {
   [DATA_SOURCES.WS]: WEBSOCKET_CHANNELS[0],
 };
 
-
+// for getting initial values for forms
+// should be ex
 export default function getInitialValues(options, existingConfig) {
     let initialValues = {};
   
@@ -57,6 +58,7 @@ export default function getInitialValues(options, existingConfig) {
         return stringify(getValue([]));
   
       default:
+        console.log("warning - getInitialValues not configured for an option of type ", option.fieldType )
         return getValue("");
     }
   }

@@ -1,13 +1,17 @@
+import BuildingBlockOptions from "Classes/BuildingBlockOptions";
 import React, { useCallback, useEffect } from "react";
 import { Formik, Form, Field, FieldArray } from "formik";
-
 import AutoField from "Configuration/AutoField";
-
 import getInitialValues from "Utils/getInitialValues";
+import stringify from "Utils/stringify";
 
-export default function GenericForm({ options, handleSubmit }) {
+
+// a generic form wrapping up AutoField
+// works either as a building block or can be triggered by a form button
+// options configured in the exact same way as a BuildingBlockOptions object
+export default function GenericForm({ options, handleSubmit = null }) {
   const initialValues = getInitialValues(options);
-
+  handleSubmit = handleSubmit || ((values) => {alert(stringify(values))})
   console.log("Generic Form Options", initialValues?.title, options, initialValues);
 
   return (
@@ -27,6 +31,8 @@ export default function GenericForm({ options, handleSubmit }) {
   );
 }
 
-/*
-
-        */
+GenericForm.options = [
+  { name: "formOptions", verbose: "Form Configuration", fieldType: "json" },
+];
+GenericForm.optionsClass = new BuildingBlockOptions(GenericForm.options);
+GenericForm.displayStyle = "alone";

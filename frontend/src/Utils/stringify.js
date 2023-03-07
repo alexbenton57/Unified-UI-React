@@ -2,6 +2,8 @@
 
 const stringOrChar = /("(?:[^\\"]|\\.)*")|[:,]/g;
 
+// formats json properly for human readability
+// wrap the result in <pre></pre> tags 
 export default function stringify(passedObj, options = {}) {
   const indent = JSON.stringify(
     [1],

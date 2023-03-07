@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from "react";
-import useMessenger from "Hooks/useMessenger";
 import BuildingBlockOptions from "Classes/BuildingBlockOptions";
 import ProgressBar from "react-bootstrap/ProgressBar";
 

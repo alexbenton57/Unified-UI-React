@@ -1,6 +1,8 @@
 import React, { Fragment } from "react";
 import stringify from "Utils/stringify";
 
+
+// error boundary surrounds building blocks, meaning that errors happening within them do not break the whole app.
 export default class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -47,3 +49,4 @@ export default class ErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+
